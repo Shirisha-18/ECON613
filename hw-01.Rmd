@@ -17,7 +17,7 @@ library(openintro)
 
 ### Exercise 1
 
-There are \_\_\_ pets in the dataset.
+There are 52519 pets in the dataset according to the data dictionary. 
 
 ### Exercise 2
 spe
