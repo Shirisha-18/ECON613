@@ -44,12 +44,22 @@ seattlepets %>%
   count(animal_name, sort = TRUE)
 ```
 
-### Exercise 4
+###     Exercise 4
 
-Remove this text, and add your answer for Exercise 4 here.
+By updating the code, we identified the most common pet names for each species. We used slice_head() to find the top names based on their frequency.
+
+Results:
+
+1. Cats: The top names are Lucy (111 occurrences), Luna (102), Lily (86), and Max (83).
+2. Dogs: The most common names are Lucy (337), Charlie (306), Bella (249), Luna (244), and Daisy (221).
+3. Goats: The name Heidi (2 occurrences) is the most common, showing generally low frequencies for goat names.
+4. Pigs: Each pig name appears only once, so all names are listed with the same frequency.
 
 ```{r most-common-cat-dog-names}
-# remove this comment and add the code for Exercise 4 here
+seattlepets %>%
+group_by(species) %>%
+count(animal_name, sort = TRUE) %>%
+slice_head(n = 5)
 ```
 
 ### Exercise 5
