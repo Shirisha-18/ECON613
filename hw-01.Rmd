@@ -20,8 +20,8 @@ library(openintro)
 There are 52519 pets in the dataset according to the data dictionary. 
 
 ### Exercise 2
-spe
-Remove this text, and add your answer for Exercise 2 here.
+
+According to the data dictionary, there are 7 variables for each pet. 
 
 ### Exercise 3
 
