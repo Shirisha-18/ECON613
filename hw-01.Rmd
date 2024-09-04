@@ -64,7 +64,11 @@ slice_head(n = 5)
 
 ### Exercise 5
 
-Remove this text, and add your answer for Exercise 5 here.
+Points above the y = x line indicate that the proportion of the name being a cat is higher than the proportion of it being a dog. Points below the y = x line indicate that the proportion of the name being a dog is higher than the proportion of it being a cat.
+
+<b>So, names that are more common for cats than dogs are represented by points above the y = x line.</b>
+
+Some of them are: Lucy, Luna, Bella, Charlie etc.
 
 ### Exercise 6
 
