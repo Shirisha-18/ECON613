@@ -10,6 +10,7 @@ output: github_document
 ```{r load-packages, message = FALSE}
 library(tidyverse)
 library(openintro)
+
 ```
 
 ## Exercises
@@ -19,7 +20,7 @@ library(openintro)
 There are \_\_\_ pets in the dataset.
 
 ### Exercise 2
-
+spe
 Remove this text, and add your answer for Exercise 2 here.
 
 ### Exercise 3
