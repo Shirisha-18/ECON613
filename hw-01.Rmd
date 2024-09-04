@@ -72,4 +72,6 @@ Some of them are: Lucy, Luna, Bella, Charlie etc.
 
 ### Exercise 6
 
-Remove this text, and add your answer for Exercise 5 here.
+The fact that most of the common names are above the y = x line and to the left means that these names are more often used for cats than for dogs. This shows a negative relationship between the two variables: as the proportion of cats with a name increases, the proportion of dogs with that name decreases. In simple terms, the names that are popular for cats are generally not as common for dogs.
+
+For example, a name like "Daisy" is very popular among cats but rarely used for dogs.
