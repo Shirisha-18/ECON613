@@ -1,7 +1,7 @@
 ---
 title: "HW 01 - Pet names"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Shirisha Biyyala"
+date: "`r Sys.Date()`"
 output: github_document
 ---
 
