@@ -9,6 +9,8 @@ output: github_document
 
 ```{r load-packages, message = FALSE}
 library(tidyverse)
+
+load("data/accidents.rda")
 ```
 
 ## Exercises
@@ -25,7 +27,9 @@ Remove this text, and add your answer for Exercise 2 here.
 
 Remove this text, and add your answer for Exercise 3 here.
 
-```{r label-me-1}
+```{r label-me-1, fig.fullwidth = TRUE}
+accidents %>%
+  mutate(day_of_week_type = if_else(day_of_week %in% c("Saturday", "Sunday"), "Weekend", "Weekday"))
 # remove this comment and add the code for Exercise 3 here
 ```
 
