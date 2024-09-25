@@ -21,7 +21,37 @@ The dataset has `r nrow(accidents)` observations.
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 2 here.
+Each row in the dataset represents an individual accident or crash incident, with each column providing specific details about that event. These details typically include:
+
+- **Date/Time** of the accident
+- **Location** (city, intersection, road)
+- **Accident type** (collision type)
+- **Vehicles involved**
+- **Weather/Road conditions**
+- **Casualties** (injuries, fatalities, damages)
+- **Other contributing factors** (e.g., speeding, alcohol)
+
+It's a record of specific accident events with all relevant information.
+
+```{r}
+view(accidents)
+```
+
+```{r, echo=FALSE, results='asis'}
+# Get the head of the dataset
+accidents_head <- head(accidents)
+
+# Create an HTML table
+html_table <- knitr::kable(accidents_head, format = "html", escape = FALSE)
+
+# Print the scrollable table
+cat(paste0(
+  "<div style='overflow-x: auto; max-width: 100%; height: 300px;'>",
+  html_table,
+  "</div>"
+))
+```
+
 
 ### Exercise 3
 
