@@ -23,13 +23,13 @@ The dataset has `r nrow(accidents)` observations.
 
 Each row in the dataset represents an individual accident or crash incident, with each column providing specific details about that event. These details typically include:
 
-- **Date/Time** of the accident
-- **Location** (city, intersection, road)
-- **Accident type** (collision type)
-- **Vehicles involved**
-- **Weather/Road conditions**
-- **Casualties** (injuries, fatalities, damages)
-- **Other contributing factors** (e.g., speeding, alcohol)
+- **ID**: Unique identifier for the accident.
+- **Easting/Northing**: Geographic coordinates for mapping.
+- **Severity**: Level of severity (e.g., slight, serious).
+- **Vehicles**: Number of vehicles involved.
+- **Casualties**: Number of injuries or fatalities.
+- **Date**: When the accident occurred.
+- etc
 
 It's a record of specific accident events with all relevant information.
 
@@ -55,12 +55,30 @@ cat(paste0(
 
 ### Exercise 3
 
-Remove this text, and add your answer for Exercise 3 here.
+#### Accident Density Plot by Time and Severity
 
-```{r label-me-1, fig.fullwidth = TRUE}
+This plot shows the **density distribution of accidents throughout the day** based on the time they occurred, separated into **Weekdays and Weekends**. The fill represents the **severity of the accidents** (e.g., Slight, Serious, Fatal).
+
+- **Facets**: The data is divided into two facets: **Weekday** and **Weekend**, allowing for a comparison of accident patterns between these time frames.
+- **X-axis**: Displays the time of day when accidents happened.
+- **Y-axis**: Represents the density of accidents, showing the probability of accidents happening at different times.
+- **Fill Colors**: The different accident severities are indicated by the colors, based on the `viridis` color palette.
+
+By visualizing this, we can identify if certain times of the day (e.g., rush hours) are associated with higher accident severity and if weekends differ from weekdays in terms of accident distribution.
+
+```{r accidents_density_plot, fig.fullwidth = TRUE}
 accidents %>%
-  mutate(day_of_week_type = if_else(day_of_week %in% c("Saturday", "Sunday"), "Weekend", "Weekday"))
-# remove this comment and add the code for Exercise 3 here
+  mutate(day_of_week_type = if_else(day_of_week %in% c("Saturday", "Sunday"), "Weekend", "Weekday")) %>%
+  ggplot(aes(x = time, fill = severity)) +  
+  geom_density(adjust = 1, alpha = 0.5) +
+  facet_grid(day_of_week_type ~ .) +
+  scale_fill_viridis_d() +
+  labs(title = "Number of accidents throughout the day",
+       subtitle = "By day of week and severity",
+       x = "Time of the Day",
+       y = "Density",
+       fill = "Severity") +
+    theme_minimal()
 ```
 
 ### Exercise 4
