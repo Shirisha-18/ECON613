@@ -1,7 +1,7 @@
 ---
 title: "HW 04 - What should I major in?"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Shirisha Biyyala"
+date: "2024-09-30"
 output: github_document
 ---
 
