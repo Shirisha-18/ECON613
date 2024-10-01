@@ -41,7 +41,7 @@ cat(paste0(
 In this code chunk, we will:
 
 - Arrange the data by the proportion of women (sharewomen) in descending order,highlighting majors with the highest proportion of women at the top.
-- Select only the relevant columns: major, total (the number of people with that major),and sharewomen (the proportion of women).
+- Select only the relevant columns: `major`, `total` (the number of people with that major),and `sharewomen` (the proportion of women).
 - Display only the top 3 majors by using top_n(3).
 
 ```{r top_n_major}
@@ -56,7 +56,7 @@ college_recent_grads %>%
 
 In this code chunk, we will:
 
-- **Visualize Median Income Distribution:** Create a histogram to illustrate how median incomes are distributed among recent graduates by major.
+- **Visualize Median Income Distribution:** Create a histogram to illustrate how median incomes are distributed among recent graduates by `major`.
   
 - **Select Binwidth:** Use a binwidth of $1000 to capture meaningful variations in income without excessive detail.
 
@@ -165,11 +165,31 @@ ggplot(data = college_recent_grads, mapping = aes(x = median)) +
 
 ### Exercise 6
 
-...
+To determine which major category has the highest typical median income, we can use the **median** statistic for each `major_category`.
+
+```{r highest-median-income}
+college_recent_grads %>%
+  group_by(major_category) %>%
+  summarise(median_income = median(median, na.rm = TRUE)) %>%
+  arrange(desc(median_income))
+```
+
+#### Interpretation
+
+1. **Top Earners:** Graduates in **Engineering** have the highest median income of **$57,000**, indicating strong market demand and earning potential in this field. This is significantly higher than all other categories.
+
+2. **Competitive Fields:** **Computers & Mathematics** also shows a strong median income of **$45,000**, reflecting the growing need for skills in technology and data analysis.
+
+3. **Moderate Income:** Majors like **Business**, **Physical Sciences**, and **Social Science** earn between **$38,000** and **$40,000**, suggesting decent opportunities but less lucrative than STEM fields.
+
+4. **Lower Earnings:** Fields such as **Psychology & Social Work** and **Arts** have the lowest median incomes, around **$30,000 to $32,750**, indicating more limited financial prospects in these areas.
+
+The data clearly indicates that majors in Engineering and Computer-related fields provide the highest earning potential, while those in the Arts and Social Work are at the lower end of the income spectrum. This information is valuable for prospective students when considering their educational and career paths.
 
 ### Exercise 7
 
-...
+
+
 
 ### Exercise 8
 
