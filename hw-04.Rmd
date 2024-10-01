@@ -240,6 +240,27 @@ The analysis reveals that all three STEM majors— `Computers & Mathematics`, `P
 
 ### Exercise 9
 
+```{r scatterplot-median-income}
+# Scatterplot of median income vs. proportion of women
+ggplot(data = college_recent_grads, aes(x = sharewomen, y = median, color = major_type)) +
+  geom_point() +
+  labs(title = "Median Income vs. Proportion of Women by Major Type",
+       x = "Proportion of Women in Major",
+       y = "Median Income") +
+  scale_color_manual(values = c("stem" = "lightblue", "not stem" = "rosybrown"),
+                     name = "Major Type",
+                     labels = c("STEM", "Not STEM")) +
+  theme_minimal()
+```
+
+#### Interpretation
+
+The scatter plot reveals a trend where:
+
+- **STEM fields** have higher representation of women but lower income potential, indicating possible barriers to income growth despite participation.
+- **Non-STEM fields** show a lower representation of women but higher average incomes, suggesting these areas may provide more immediate financial benefits.
+
+This contrast highlights important considerations regarding the economic outcomes associated with different major types for women and could inform strategies to enhance women's earning potential in STEM fields.
 
 
 ### Exercise 10
