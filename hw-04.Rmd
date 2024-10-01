@@ -13,14 +13,29 @@ library(scales)
 library(fivethirtyeight)
 ```
 
+```{r understand-data}
+glimpse(college_recent_grads)
+?college_recent_grads
+view(college_recent_grads)
+```
+
 ## Exercises
 
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+In this code chunk, we will:
+
+- Arrange the data by the proportion of women (sharewomen) in descending order,highlighting majors with the highest proportion of women at the top.
+- Select only the relevant columns: major, total (the number of people with that major),and sharewomen (the proportion of women).
+- Display only the top 3 majors by using top_n(3).
+
+```{r top_n_major}
+college_recent_grads %>%
+  arrange(desc(sharewomen)) %>% 
+  select(major, total, sharewomen) %>%
+  top_n(3)
+```
+
 
 ### Exercise 2
 
