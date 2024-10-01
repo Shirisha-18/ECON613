@@ -14,9 +14,9 @@ library(fivethirtyeight)
 ```
 
 ```{r understand-data}
-glimpse(college_recent_grads)
-?college_recent_grads
-view(college_recent_grads)
+#glimpse(college_recent_grads)
+#?college_recent_grads
+#view(college_recent_grads)
 ```
 
 ```{r college_recent_grads_head, echo=FALSE, results='asis'}
@@ -54,10 +54,36 @@ college_recent_grads %>%
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 2 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+In this code chunk, we will:
+
+- **Visualize Median Income Distribution:** Create a histogram to illustrate how median incomes are distributed among recent graduates by major.
+  
+- **Select Binwidth:** Use a binwidth of $1000 to capture meaningful variations in income without excessive detail.
+
+- **Analyze Distribution Characteristics:** Examine the histogram to identify patterns, skewness, and potential outliers in the income data.
+
+```{r histogram-visualization}
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram() +
+  theme_minimal()
+
+
+# Create histogram with a binwidth of $1000
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 1000, fill = "lightblue") +
+  labs(title = "Distribution of Median Incomes (Binwidth = $1000)",
+       x = "Median Income",
+       y = "Count") +
+  theme_minimal()
+
+# Create histogram with a binwidth of $5000
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 5000, fill = "rosybrown") +
+  labs(title = "Distribution of Median Incomes (Binwidth = $5000)",
+       x = "Median Income",
+       y = "Count") +
+  theme_minimal()
+```
 
 ### Exercise 3
 
