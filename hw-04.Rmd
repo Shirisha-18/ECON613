@@ -19,6 +19,21 @@ glimpse(college_recent_grads)
 view(college_recent_grads)
 ```
 
+```{r college_recent_grads_head, echo=FALSE, results='asis'}
+# Get the head of the dataset
+college_recent_grads_head <- head(college_recent_grads)
+
+# Create an HTML table
+html_table <- knitr::kable(college_recent_grads_head, format = "html", escape = FALSE)
+
+# Print the scrollable table
+cat(paste0(
+  "<div style='overflow-x: auto; max-width: 100%; height: 300px;'>",
+  html_table,
+  "</div>"
+))
+```
+
 ## Exercises
 
 ### Exercise 1
