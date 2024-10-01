@@ -92,12 +92,14 @@ Both histograms will illustrate the distribution of median incomes effectively, 
 ### Exercise 3
 
 ```{r summary-statistics}
-college_recent_grads %>%
+summary_stats <- college_recent_grads %>%
   summarise(min = min(median), max = max(median),
             mean = mean(median), med = median(median),
             sd = sd(median), 
             q1 = quantile(median, probs = 0.25),
             q3 = quantile(median, probs = 0.75))
+
+summary_stats
 ```
 
 #### Interpretation
@@ -129,18 +131,6 @@ The histograms reveal a **right-skewed** distribution of median incomes, indicat
 ### Summary Statistics Output
 
 ```{r summary-statistics-table}
-# Calculate summary statistics
-summary_stats <- college_recent_grads %>%
-  summarise(
-    min = min(median, na.rm = TRUE),
-    max = max(median, na.rm = TRUE),
-    mean = mean(median, na.rm = TRUE),
-    med = median(median, na.rm = TRUE),
-    sd = sd(median, na.rm = TRUE),
-    q1 = quantile(median, probs = 0.25, na.rm = TRUE),
-    q3 = quantile(median, probs = 0.75, na.rm = TRUE)
-  )
-
 # Display summary statistics as a table
 knitr::kable(summary_stats, format = "html", caption = "Summary Statistics for Median Incomes")
 ```
@@ -151,7 +141,27 @@ The median and IQR are the most useful statistics for understanding this right-s
 
 ### Exercise 5
 
-...
+### Faceted Histogram of Median Income
+
+In this code chunk, we will:
+
+- Plot the distribution of median income using a histogram, allowing us to visualize how median income varies across different major categories.
+- Use a binwidth of $5000, which was determined to be appropriate in the previous exercise.
+- Facet the histogram by `major_category`, providing a clear comparison of income distributions for each category.
+
+This visualization helps in understanding the disparities in median income among various fields of study, highlighting trends and differences effectively.
+
+```{r faceted-histogram}
+# Create faceted histogram of median income by major_category
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 5000, fill = "lightblue") +
+  labs(title = "Distribution of Median Income by Major Category",
+       x = "Median Income",
+       y = "Count") +
+  facet_wrap(~ major_category) +
+  theme_minimal()
+```
+
 
 ### Exercise 6
 
