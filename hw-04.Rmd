@@ -188,7 +188,14 @@ The data clearly indicates that majors in Engineering and Computer-related field
 
 ### Exercise 7
 
+```{r least-popular-major}
+college_recent_grads %>%
+  count(major_category) %>%
+  arrange(n)
+```
 
+#### Interpretation
+In summary, the data highlights that the Interdisciplinary major is the least popular among the surveyed students, which could be a point of interest for educational institutions looking to understand student preferences and improve program offerings.
 
 
 ### Exercise 8
