@@ -21,14 +21,59 @@ I, Shirisha Biyyala, hereby state that I have not communicated with or gained in
 
 ```{r load-packages, message=FALSE}
 # load required packages here
-
+library(tidyverse)
+library(nycflights13)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(htmltools)
 ```
 
 ## Questions 
 
+This section allows us to view the entire `flights` dataset from the `nycflights13` package. It also provides access to documentation for understanding the datasets' variables and attributes.
+
+
+```{r understand-data}
+#view(flights)
+#?flights
+```
+
+In this section, we extract the first few rows of the `flights` dataset to get a **glimpse of the data**. 
+
+```{r flights-head}
+# Get the head of the dataset
+flights_head <- head(flights)
+
+# Create an HTML table
+html_table <- knitr::kable(flights_head, format = "html", escape = FALSE)
+
+# Print the scrollable table
+HTML(paste0(
+  "<div style='overflow-x: auto; max-width: 100%; height: 300px;'>",
+  html_table,
+  "</div>"
+))
+```
+
+This section conducts an initial **exploratory analysis** by checking the structure of the `flights` dataset using glimpse, which provides a compact view of the data types and sample values. It counts the number of missing values in each column to identify potential issues with data completeness. Finally, **summary statistics** are generated for key features like departure delay, arrival delay, distance, and airtime, allowing for a better understanding of flight performance and trends.
+
+
+```{r exploratory-data-analysis}
+# Check structure and missing values
+glimpse(flights)
+
+# Count missing values in each column
+sapply(flights, function(x) sum(is.na(x)))
+
+# Summary statistics for key features
+summary(flights %>% select(dep_delay, arr_delay, distance, air_time))
+```
+
 ### Question 1
 
-[Enter code and narrative here.]
+```{r most-common-destinations}
+```
 
 ### Question 2
 
