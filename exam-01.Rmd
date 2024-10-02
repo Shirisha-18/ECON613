@@ -1,9 +1,9 @@
 ---
-title: "MILESTONE EXAM 1 - STUDENT TEMPLATE"
+title: "MILESTONE EXAM 1"
 author: "Shirisha Biyyala"
 date: "Due: October 2, 2024"
 output: 
-  github_document: 
+  html_document: 
     fig_height: 4
     fig_width: 7
 ---
@@ -27,6 +27,7 @@ library(ggplot2)
 library(dplyr)
 library(knitr)
 library(htmltools)
+library(leaflet)
 ```
 
 ## Questions 
@@ -290,7 +291,78 @@ The aircraft that operated this flight has a seating capacity of **292 seats**. 
 
 ### Question 7
 
-[Enter code and narrative here.]
+To analyze the geographical distribution of airports in the *Contiguous United States*, we will visualize the longitudes of the airports. First, we need to filter based on the **latitude and longitude coordinates** that correspond to the contiguous United States.
+
+
+```{r histogram-airports}
+# Filter for airports in the contiguous U.S.
+contiguous_us_airports <- airports %>%
+  filter(lat >= 24.396308 & lat <= 49.384358,  # Latitude bounds for contiguous U.S.
+         lon >= -125.0 & lon <= -66.93457)   # Longitude bounds for contiguous U.S.
+
+# Create a histogram of the longitudes
+ggplot(contiguous_us_airports, aes(x = lon)) +
+  geom_histogram(binwidth = 15, fill = "rosybrown") +
+  labs(title = "Distribution of Longitudes of Airports in the Contiguous United States",
+       x = "Longitude",
+       y = "Number of Airports") +
+  theme_minimal()
+```
+
+```{r point-density-airports}
+# Create a point density map
+ggplot(data = contiguous_us_airports, aes(x = lon, y = lat)) +
+  stat_density_2d(aes(fill = ..level..), 
+                  geom = "polygon", 
+                  color = "white", 
+                  size = 0.3, 
+                  contour = TRUE) +
+  scale_fill_viridis_c(option = "B", direction = -1) +  
+  labs(title = "Density of Airports in the Contiguous United States",
+       x = "Longitude",
+       y = "Latitude",
+       fill = "Density") +
+  theme_minimal() +
+  coord_fixed()
+
+```
+
+
+```{r leaflet-maps-airport}
+# Create a Leaflet map
+leaflet(data = contiguous_us_airports) %>%
+  addTiles() %>%  # Add default OpenStreetMap tiles
+  addCircleMarkers(
+    ~lon, ~lat, 
+    radius = 2, 
+    color = "rosybrown", 
+    stroke = FALSE, 
+    fillOpacity = 0.5, 
+    clusterOptions = markerClusterOptions()  # Cluster markers for better visibility
+  ) %>%
+  setView(lng = -95, lat = 37.5, zoom = 4) %>%  # Set initial view to the center of the contiguous U.S.
+  addLegend("bottomright", 
+            pal = colorNumeric("Reds", NULL), 
+            values = ~nrow(contiguous_us_airports), 
+            title = "Airport Density",
+            opacity = 1)
+```
+
+#### Interpretation of the Visualizations
+
+The histogram displays the distribution of longitudes for airports located in the Contiguous United States. 
+
+The distribution shows a **higher concentration of airports** along the eastern and western coasts, particularly between longitudes of **-90 to -70** degrees and **-125 to -100** degrees.
+
+There is a noticeable **decrease** in the number of airports in the **central United States**, indicating that certain areas may have fewer airports relative to the coastal regions.
+
+Major cities such as New York and Los Angeles which are located near the coasts, contribute to the higher density of airports in these longitude ranges.
+
+#### References
+
+1. https://qr.ae/p25ElE
+2. https://qr.ae/p25E6R
+3. https://r-charts.com/spatial/interactive-maps-leaflet/
 
 ### Question 8
 
