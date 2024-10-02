@@ -1,13 +1,13 @@
 MILESTONE EXAM 1 - STUDENT TEMPLATE
 ================
-\[ENTER NAME HERE\]
-Due: \[DUE DATE HERE\]
+Shirisha Biyyala
+Due: October 2, 2024
 
 ## Academic Honesty Statement
 
-I, \_\_\_\_\_\_\_\_\_\_\_\_, hereby state that I have not communicated
-with or gained information in any way from my classmates or anyone other
-than the Professor or TA during this exam, and that all work is my own.
+I, Shirisha Biyyala, hereby state that I have not communicated with or
+gained information in any way from my classmates or anyone other than
+the Professor or TA during this exam, and that all work is my own.
 
 ## Load packages
 
