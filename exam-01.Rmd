@@ -125,10 +125,67 @@ The carrier with the highest mean arrival delay is **Frontier Airlines Inc. (F9)
 #### Lowest mean arrival delay
 Conversely, **Alaska Airlines Inc. (AS)** had the lowest mean arrival delay, averaging **-9.93 minutes**. This negative value indicates that, on average, Alaska Airlines flights arrived about **10 minutes earlier** than scheduled. This suggests that Alaska Airlines was the most punctual among the carriers analyzed, performing well in terms of timely arrivals.
 
-
 ### Question 4
 
-[Enter code and narrative here.]
+In this code, we're working on **identifying the mean temperature at the origin airport** on the day with the highest total departure delay in 2013.
+
+#### Step 4.1: Find the Day with the Highest Departure Delay
+
+```{r max-dep-delay}
+# To find the day with the highest departure delay
+max_dep_delay <- flights %>% 
+  group_by(year, month, day) %>% 
+  summarise(total_dep_delay = sum(dep_delay, na.rm = TRUE), .groups = 'drop') %>% 
+  arrange(desc(total_dep_delay)) %>% 
+  slice(1)
+
+max_dep_delay
+```
+
+The goal here is to group `flights` by date (`year`, `month`, `day`) and calculate the total departure delay for each day. By using `arrange(desc(total_dep_delay))`, the days are sorted in descending order of total delay, and `slice(1)` selects the day with the maximum total delay. This gives us the specific date to focus on.
+
+From this table, we identified that **March 8, 2013**, had the highest total departure delay, amounting to **66,746 minutes**. This indicates that on this particular day, there was a significant disruption at NYC airports, causing extensive delays across multiple flights.
+
+
+#### Step 4.2: Aggregate Weather Data by Day and Origin Airport
+
+Initially, a warning occurred due to multiple rows in both datasets matching each other on the same day and airport. To avoid the *many-to-many relationship* issue during the data join, we combine the weather data by year, month, day, and origin. We calculate the daily mean temperature using the `mean(temp, na.rm = TRUE)` function. This ensures that, when joined with `flight` data, there’s a *single temperature value for each origin airport on each day*.
+
+```{r weather-origin}
+# Combine the weather data to get the mean temperature per day and origin airport
+weather_daily <- weather %>%
+  group_by(year, month, day, origin) %>%
+  summarise(mean_temperature = mean(temp, na.rm = TRUE), .groups = 'drop')
+
+weather_daily
+```
+
+#### Step 4.3: Join Flights with Weather Data
+In this step, we filter the flights data to select only the flights that occurred on the day with the highest total departure delay. Then, we perform a left_join() with the aggregated weather data (weather_daily) based on matching year, month, day, and origin.
+
+```{r mean-temp-dep-delay}
+# Join the flight data with the combined weather data
+mean_temp <- flights %>%
+  filter(year == max_dep_delay$year, month == max_dep_delay$month, day == max_dep_delay$day) %>%
+  left_join(weather_daily, by = c("year", "month", "day", "origin")) %>%
+  distinct(origin, .keep_all = TRUE) %>%  # Remove duplicates if needed
+  mutate(date = as.Date(paste(max_dep_delay$year, max_dep_delay$month, max_dep_delay$day, sep = "-"))) %>%
+  select(origin, date, mean_temperature)
+
+mean_temp
+```
+
+
+This table provides the mean temperature at each of the three NYC airports (JFK, EWR, and LGA) on March 8, 2013:
+
+- **JFK**: The mean temperature was **34.97°F**.
+- **EWR (Newark)**: The mean temperature was **35.31°F**.
+- **LGA (LaGuardia)**: The mean temperature was **36.34°F**.
+
+This gives us insight into the weather conditions on the day with the most significant departure delays. Although the temperatures were close to each other across the three airports, all hovered around the mid-30s Fahrenheit, which is relatively cool and might have contributed to flight delays, especially if there were additional weather factors like wind or precipitation.
+
+#### Conclusion:
+The day with the highest total departure delay was **March 8, 2013**, with a total delay of **66,746 minutes**. The mean temperatures at the NYC airports on that day were around **35°F**, but further investigation into specific weather events (e.g., storms) may explain why such extensive delays occurred.
 
 ### Question 5
 

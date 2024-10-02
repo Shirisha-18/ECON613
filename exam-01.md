@@ -309,11 +309,103 @@ travelers flying out of New York City in 2013.
 
 ### Question 2
 
-\[Enter code and narrative here.\]
+To determine which airlines had the **most flights departing** from NYC
+airports in 2013, I grouped the `flights` dataset by the `carrier`
+column and calculated the total number of flights for each airline. I
+then joined this data with the airlines dataset to retrieve the airline
+names, sorted the results in descending order, and presented the flight
+counts alongside their respective airline names.
+
+``` r
+flights %>% 
+  group_by(carrier) %>% 
+  summarise(flight_count = n()) %>% 
+  arrange(desc(flight_count)) %>%            
+  left_join(airlines, by = "carrier") %>% 
+  rename(airline_name = name)
+```
+
+    ## # A tibble: 16 × 3
+    ##    carrier flight_count airline_name               
+    ##    <chr>          <int> <chr>                      
+    ##  1 UA             58665 United Air Lines Inc.      
+    ##  2 B6             54635 JetBlue Airways            
+    ##  3 EV             54173 ExpressJet Airlines Inc.   
+    ##  4 DL             48110 Delta Air Lines Inc.       
+    ##  5 AA             32729 American Airlines Inc.     
+    ##  6 MQ             26397 Envoy Air                  
+    ##  7 US             20536 US Airways Inc.            
+    ##  8 9E             18460 Endeavor Air Inc.          
+    ##  9 WN             12275 Southwest Airlines Co.     
+    ## 10 VX              5162 Virgin America             
+    ## 11 FL              3260 AirTran Airways Corporation
+    ## 12 AS               714 Alaska Airlines Inc.       
+    ## 13 F9               685 Frontier Airlines Inc.     
+    ## 14 YV               601 Mesa Airlines Inc.         
+    ## 15 HA               342 Hawaiian Airlines Inc.     
+    ## 16 OO                32 SkyWest Airlines Inc.
+
+From the table, we can see that **United Air Lines Inc.** (58665) had
+the highest number of flights from NYC, followed by **JetBlue
+Airways**(54635) and **ExpressJet Airlines Inc.**(54173) This highlights
+the dominance of these airlines in the NYC air travel market during
+2013.
 
 ### Question 3
 
-\[Enter code and narrative here.\]
+To analyze the **arrival delays of flights** with non-missing delay
+information, I filtered the `flights` dataset to exclude any rows where
+the `arr_delay` value is missing. I then grouped the data by the
+`carrier` column, calculating the *mean arrival delay for each airline*.
+After sorting the results, I identified the carrier with the **highest
+and lowest mean arrival delays**, along with their corresponding carrier
+codes.
+
+``` r
+flights %>% 
+  filter(!is.na(arr_delay)) %>% 
+  group_by(carrier) %>% 
+  summarise(mean_arr_delay = round(mean(arr_delay), 4)) %>%
+  left_join(airlines, by= "carrier") %>% 
+  arrange(desc(mean_arr_delay))
+```
+
+    ## # A tibble: 16 × 3
+    ##    carrier mean_arr_delay name                       
+    ##    <chr>            <dbl> <chr>                      
+    ##  1 F9              21.9   Frontier Airlines Inc.     
+    ##  2 FL              20.1   AirTran Airways Corporation
+    ##  3 EV              15.8   ExpressJet Airlines Inc.   
+    ##  4 YV              15.6   Mesa Airlines Inc.         
+    ##  5 OO              11.9   SkyWest Airlines Inc.      
+    ##  6 MQ              10.8   Envoy Air                  
+    ##  7 WN               9.65  Southwest Airlines Co.     
+    ##  8 B6               9.46  JetBlue Airways            
+    ##  9 9E               7.38  Endeavor Air Inc.          
+    ## 10 UA               3.56  United Air Lines Inc.      
+    ## 11 US               2.13  US Airways Inc.            
+    ## 12 VX               1.76  Virgin America             
+    ## 13 DL               1.64  Delta Air Lines Inc.       
+    ## 14 AA               0.364 American Airlines Inc.     
+    ## 15 HA              -6.92  Hawaiian Airlines Inc.     
+    ## 16 AS              -9.93  Alaska Airlines Inc.
+
+#### Highest mean arrival delay
+
+The carrier with the highest mean arrival delay is **Frontier Airlines
+Inc. (F9)**, with an average delay of **21.92 minutes**. This indicates
+that, on average, flights operated by Frontier Airlines arrived nearly
+**22 minutes later** than their scheduled time, suggesting potential
+operational challenges affecting punctuality.
+
+#### Lowest mean arrival delay
+
+Conversely, **Alaska Airlines Inc. (AS)** had the lowest mean arrival
+delay, averaging **-9.93 minutes**. This negative value indicates that,
+on average, Alaska Airlines flights arrived about **10 minutes earlier**
+than scheduled. This suggests that Alaska Airlines was the most punctual
+among the carriers analyzed, performing well in terms of timely
+arrivals.
 
 ### Question 4
 
