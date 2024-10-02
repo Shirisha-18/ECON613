@@ -366,7 +366,30 @@ Major cities such as New York and Los Angeles which are located near the coasts,
 
 ### Question 8
 
-[Enter code and narrative here.]
+This visualization displays the relationship between flight arrival status ("ontime" or "delayed") and departure delays across three major New York City airports (EWR, JFK, LGA) and two destinations (PHL and RDU) for flights in December 2013. Each boxplot shows the distribution of departure delays for flights that either arrived on time or were delayed. The use of faceting allows us to compare the performance of different airport pairs.
+
+```{r box-plot}
+# Filter flights for December 2013 and create arrival status variable
+flights_december <- flights %>%
+  filter(month == 12, !is.na(dep_delay), !is.na(arr_delay)) %>%
+  mutate(arrival = ifelse(arr_delay <= 0, "ontime", "delayed")) %>%
+  filter(dest %in% c("PHL", "RDU"), origin %in% c("EWR", "JFK", "LGA"))
+
+# Create the box plot with facet_grid for destination and origin
+ggplot(flights_december, aes(x = arrival, y = dep_delay, color = dest)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Destination", 
+                    values = c("PHL" = "orangered", "RDU" = "darkturquoise")) +
+  labs(title = "On time performance of NYC flights",
+       subtitle = "December 2013",
+       x = "Arrival",
+       y = "Departure delay") +
+  facet_grid(dest ~ origin)
+```
+
+#### Interpretation
+
+The point of this visualization might be to illustrate how departure delays relate to arrival delays and whether certain airports or destinations exhibit more delay patterns. For example, it can help identify if flights departing from specific airports, like EWR or JFK, are more prone to departure delays that lead to late arrivals at PHL or RDU.
 
 ### Extra Credit
 
