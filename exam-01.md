@@ -409,11 +409,128 @@ arrivals.
 
 ### Question 4
 
-\[Enter code and narrative here.\]
+In this code, we’re working on **identifying the mean temperature at the
+origin airport** on the day with the highest total departure delay in
+2013.
+
+#### Step 4.1: Find the Day with the Highest Departure Delay
+
+``` r
+# To find the day with the highest departure delay
+max_dep_delay <- flights %>% 
+  group_by(year, month, day) %>% 
+  summarise(total_dep_delay = sum(dep_delay, na.rm = TRUE), .groups = 'drop') %>% 
+  arrange(desc(total_dep_delay)) %>% 
+  slice(1)
+
+max_dep_delay
+```
+
+    ## # A tibble: 1 × 4
+    ##    year month   day total_dep_delay
+    ##   <int> <int> <int>           <dbl>
+    ## 1  2013     3     8           66746
+
+The goal here is to group `flights` by date (`year`, `month`, `day`) and
+calculate the total departure delay for each day. By using
+`arrange(desc(total_dep_delay))`, the days are sorted in descending
+order of total delay, and `slice(1)` selects the day with the maximum
+total delay. This gives us the specific date to focus on.
+
+From this table, we identified that **March 8, 2013**, had the highest
+total departure delay, amounting to **66,746 minutes**. This indicates
+that on this particular day, there was a significant disruption at NYC
+airports, causing extensive delays across multiple flights.
+
+#### Step 4.2: Join Flights with Weather Data
+
+Initially, a warning was triggered due to multiple rows from both
+datasets matching each other on the same day and airport, creating a
+many-to-many relationship. To handle this, we first combined the weather
+data by grouping it by year, month, day, and origin. This ensures that
+for each origin airport on each day, we have a single temperature value.
+
+We calculate the daily mean temperature using the
+`mean(temp, na.rm = TRUE)` function. By grouping and summarizing, we
+ensure that when joining the flight data with the weather data, the join
+operation provides a unique temperature value for each origin on each
+specific day.
+
+``` r
+# Filter weather data for that day and origin airport
+mean_temp <- flights %>%
+  filter(year == max_dep_delay$year, 
+         month == max_dep_delay$month, 
+         day == max_dep_delay$day) %>%
+  left_join(weather, by = c("year", "month", "day", "origin"), 
+            relationship = "many-to-many") %>%  # To handle many-to-many relationship
+  group_by(origin) %>%  # Group by origin to retain it in summarise
+  summarise(mean_temperature = mean(temp, na.rm = TRUE), .groups = 'drop') %>%
+  mutate(date = as.Date(paste(max_dep_delay$year, max_dep_delay$month, max_dep_delay$day, sep = "-"))) %>%
+  select(origin, date, mean_temperature)  
+
+mean_temp
+```
+
+    ## # A tibble: 3 × 3
+    ##   origin date       mean_temperature
+    ##   <chr>  <date>                <dbl>
+    ## 1 EWR    2013-03-08             35.3
+    ## 2 JFK    2013-03-08             35.0
+    ## 3 LGA    2013-03-08             36.3
+
+This table provides the mean temperature at each of the three NYC
+airports (JFK, EWR, and LGA) on March 8, 2013:
+
+- **JFK**: The mean temperature was **34.97°F**.
+- **EWR (Newark)**: The mean temperature was **35.31°F**.
+- **LGA (LaGuardia)**: The mean temperature was **36.34°F**.
+
+This gives us insight into the weather conditions on the day with the
+most significant departure delays. Although the temperatures were close
+to each other across the three airports, all hovered around the mid-30s
+Fahrenheit, which is relatively cool and might have contributed to
+flight delays, especially if there were additional weather factors like
+wind or precipitation.
+
+#### Conclusion:
+
+The day with the highest total departure delay was **March 8, 2013**,
+with a total delay of **66,746 minutes**. The mean temperatures at the
+NYC airports on that day were around **35°F**, but further investigation
+into specific weather events (e.g., storms) may explain why such
+extensive delays occurred.
 
 ### Question 5
 
-\[Enter code and narrative here.\]
+``` r
+# Define the time intervals
+flights_time_intervals <- flights %>%
+  filter(!is.na(dep_delay)) %>%                   # Filter flights with non-missing dep_delay
+  mutate(time_interval = case_when(
+    dep_time >= 0 & dep_time <= 600 ~ "12:01am-6am",     # Early morning
+    dep_time > 600 & dep_time <= 1200 ~ "6:01am-12pm",   # Morning
+    dep_time > 1200 & dep_time <= 1800 ~ "12:01pm-6pm",  # Afternoon
+    dep_time > 1800 & dep_time <= 2400 ~ "6:01pm-12am"   # Evening
+  )) %>%
+  group_by(time_interval) %>%
+  summarise(
+    total_flights = n(),                               # Total number of flights in each interval
+    delayed_flights = sum(dep_delay > 0, na.rm = TRUE), # Count flights delayed
+    prop_delayed = delayed_flights / total_flights      # Proportion of delayed flights
+  ) %>%
+  arrange(time_interval)  # Sort by time interval
+
+flights_time_intervals
+```
+
+    ## # A tibble: 4 × 4
+    ##   time_interval total_flights delayed_flights prop_delayed
+    ##   <chr>                 <int>           <int>        <dbl>
+    ## 1 12:01am-6am            9344            1553        0.166
+    ## 2 12:01pm-6pm          120738           53151        0.440
+    ## 3 6:01am-12pm          122082           30178        0.247
+    ## 4 6:01pm-12am           76357           43550        0.570
 
 ### Question 6
 

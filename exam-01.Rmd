@@ -125,6 +125,9 @@ The carrier with the highest mean arrival delay is **Frontier Airlines Inc. (F9)
 #### Lowest mean arrival delay
 Conversely, **Alaska Airlines Inc. (AS)** had the lowest mean arrival delay, averaging **-9.93 minutes**. This negative value indicates that, on average, Alaska Airlines flights arrived about **10 minutes earlier** than scheduled. This suggests that Alaska Airlines was the most punctual among the carriers analyzed, performing well in terms of timely arrivals.
 
+#### References
+1. https://stackoverflow.com/questions/66422564/round-numbers-in-r-correctly
+
 ### Question 4
 
 In this code, we're working on **identifying the mean temperature at the origin airport** on the day with the highest total departure delay in 2013.
@@ -147,49 +150,95 @@ The goal here is to group `flights` by date (`year`, `month`, `day`) and calcula
 From this table, we identified that **March 8, 2013**, had the highest total departure delay, amounting to **66,746 minutes**. This indicates that on this particular day, there was a significant disruption at NYC airports, causing extensive delays across multiple flights.
 
 
-#### Step 4.2: Aggregate Weather Data by Day and Origin Airport
+#### Step 4.2: Join Flights with Weather Data
 
-Initially, a warning occurred due to multiple rows in both datasets matching each other on the same day and airport. To avoid the *many-to-many relationship* issue during the data join, we combine the weather data by year, month, day, and origin. We calculate the daily mean temperature using the `mean(temp, na.rm = TRUE)` function. This ensures that, when joined with `flight` data, there’s a *single temperature value for each origin airport on each day*.
+Initially, a warning was triggered due to multiple rows from both datasets matching each other on the same day and airport, creating a many-to-many relationship. To handle this, we first combined the weather data by grouping it by year, month, day, and origin. This ensures that for each origin airport on each day, we have a single temperature value.
+
+We calculate the daily mean temperature using the `mean(temp, na.rm = TRUE)` function. By grouping and summarizing, we ensure that when joining the flight data with the weather data, the join operation provides a unique temperature value for each origin on each specific day.
 
 ```{r weather-origin}
-# Combine the weather data to get the mean temperature per day and origin airport
-weather_daily <- weather %>%
-  group_by(year, month, day, origin) %>%
-  summarise(mean_temperature = mean(temp, na.rm = TRUE), .groups = 'drop')
-
-weather_daily
-```
-
-#### Step 4.3: Join Flights with Weather Data
-In this step, we filter the flights data to select only the flights that occurred on the day with the highest total departure delay. Then, we perform a left_join() with the aggregated weather data (weather_daily) based on matching year, month, day, and origin.
-
-```{r mean-temp-dep-delay}
-# Join the flight data with the combined weather data
+# Filter weather data for that day and origin airport
 mean_temp <- flights %>%
-  filter(year == max_dep_delay$year, month == max_dep_delay$month, day == max_dep_delay$day) %>%
-  left_join(weather_daily, by = c("year", "month", "day", "origin")) %>%
-  distinct(origin, .keep_all = TRUE) %>%  # Remove duplicates if needed
+  filter(year == max_dep_delay$year, 
+         month == max_dep_delay$month, 
+         day == max_dep_delay$day) %>%
+  left_join(weather, by = c("year", "month", "day", "origin"), 
+            relationship = "many-to-many") %>%  # To handle many-to-many relationship
+  group_by(origin) %>%  # Group by origin to retain it in summarise
+  summarise(mean_temperature = mean(temp, na.rm = TRUE), .groups = 'drop') %>%
   mutate(date = as.Date(paste(max_dep_delay$year, max_dep_delay$month, max_dep_delay$day, sep = "-"))) %>%
-  select(origin, date, mean_temperature)
+  select(origin, date, mean_temperature)  
 
 mean_temp
 ```
 
-
 This table provides the mean temperature at each of the three NYC airports (JFK, EWR, and LGA) on March 8, 2013:
 
 - **JFK**: The mean temperature was **34.97°F**.
-- **EWR (Newark)**: The mean temperature was **35.31°F**.
-- **LGA (LaGuardia)**: The mean temperature was **36.34°F**.
+- **EWR**: The mean temperature was **35.31°F**.
+- **LGA**: The mean temperature was **36.34°F**.
 
 This gives us insight into the weather conditions on the day with the most significant departure delays. Although the temperatures were close to each other across the three airports, all hovered around the mid-30s Fahrenheit, which is relatively cool and might have contributed to flight delays, especially if there were additional weather factors like wind or precipitation.
 
 #### Conclusion:
 The day with the highest total departure delay was **March 8, 2013**, with a total delay of **66,746 minutes**. The mean temperatures at the NYC airports on that day were around **35°F**, but further investigation into specific weather events (e.g., storms) may explain why such extensive delays occurred.
 
+#### References
+
+1. https://stackoverflow.com/questions/39420136/combine-separate-year-and-month-columns-into-single-date-column
+2. https://dplyr.tidyverse.org/reference/mutate-joins.html
+
 ### Question 5
 
-[Enter code and narrative here.]
+The code filters flights to exclude those with missing departure delays, then categorizes the remaining flights into *four time intervals* based on their departure times using the `case_when()` function. It groups the data by these intervals, calculating the total number of flights and the count of delayed flights for each interval. The proportion of delayed flights is calculated using the formula:
+
+\[
+\text{Proportion of Delayed Flights} = \frac{\text{Delayed Flights}}{\text{Total Flights}}
+\]
+
+Finally, it sorts the intervals in chronological order to provide a clear view of how delays fluctuate throughout the day.
+
+
+```{r flight-delay-time-interval}
+# Define the time intervals
+flights_time_intervals <- flights %>%
+  filter(!is.na(dep_delay)) %>%                   # Filter flights with non-missing dep_delay
+  mutate(time_interval = case_when(
+    dep_time >= 0 & dep_time <= 600 ~ "12:01am-6am",     # Early morning
+    dep_time > 600 & dep_time <= 1200 ~ "6:01am-12pm",   # Morning
+    dep_time > 1200 & dep_time <= 1800 ~ "12:01pm-6pm",  # Afternoon
+    dep_time > 1800 & dep_time <= 2400 ~ "6:01pm-12am"   # Evening
+  )) %>%
+  group_by(time_interval) %>%
+  summarise(
+    total_flights = n(),                               # Total number of flights in each interval
+    delayed_flights = sum(dep_delay > 0, na.rm = TRUE), # Count flights delayed
+    prop_delayed = round(delayed_flights / total_flights, 4)      # Proportion of delayed flights
+  ) %>%
+  arrange(time_interval)  # Sort by time interval
+
+flights_time_intervals
+```
+
+#### Key Findings:
+
+**Early Morning (12:01am-6am):**  
+This period shows the lowest proportion of delayed flights at 16.6%. Fewer flights and reduced airport congestion during the early hours may contribute to this.
+
+**Morning (6:01am-12pm):**  
+The proportion of delayed flights rises to 24.7%. This could be due to increased air traffic as more flights depart during the morning, leading to slight operational delays.
+
+**Afternoon (12:01pm-6pm):**  
+During this period, delays become more frequent, with 44% of flights delayed. The afternoon tends to have heavy air traffic, and delays from earlier in the day can accumulate.
+
+**Evening (6:01pm-12am):**  
+The likelihood of delay is highest in the evening, with 57% of flights experiencing delays. This suggests that delays compound as the day progresses, resulting in more late departures by evening.
+
+#### Conclusion:
+The analysis shows that the chances of a flight being delayed at departure steadily increase throughout the day. Early morning flights are the least likely to be delayed, while flights departing in the evening face a much higher probability of delay. This pattern is likely due to the buildup of delays from earlier flights, increasing congestion, and operational challenges during peak travel times.
+
+#### References
+1. https://stackoverflow.com/a/64980831
 
 ### Question 6
 
