@@ -23,6 +23,8 @@ library(htmltools)
 
 ## Questions
 
+#### Understand the dataset
+
 This section allows us to view the entire `flights` dataset from the
 `nycflights13` package. It also provides access to documentation for
 understanding the datasets’ variables and attributes.
@@ -204,6 +206,8 @@ HTML(paste0(
 </tbody>
 </table></div>
 
+#### Exploratory Data Analysis
+
 This section conducts an initial **exploratory analysis** by checking
 the structure of the `flights` dataset using glimpse, which provides a
 compact view of the data types and sample values. It counts the number
@@ -268,6 +272,37 @@ summary(flights %>% select(dep_delay, arr_delay, distance, air_time))
     ##  NA's   :8255      NA's   :9430                      NA's   :9430
 
 ### Question 1
+
+``` r
+flights %>% 
+  group_by(dest) %>% 
+  summarise(flight_count = n()) %>% 
+  arrange(desc(flight_count)) %>% 
+  top_n(10)   # Select the top 10 destinations
+```
+
+    ## Selecting by flight_count
+
+    ## # A tibble: 10 × 2
+    ##    dest  flight_count
+    ##    <chr>        <int>
+    ##  1 ORD          17283
+    ##  2 ATL          17215
+    ##  3 LAX          16174
+    ##  4 BOS          15508
+    ##  5 MCO          14082
+    ##  6 CLT          14064
+    ##  7 SFO          13331
+    ##  8 FLL          12055
+    ##  9 MIA          11728
+    ## 10 DCA           9705
+
+From the table, we can see that *Chicago O’Hare International Airport
+(ORD)* had the highest number of flights from NYC, followed closely by
+Atlanta Hartsfield-Jackson International Airport (ATL) and Los Angeles
+International Airport (LAX). This indicates that these cities were the
+most popular destinations for travelers flying out of New York City in
+2013.
 
 ### Question 2
 
