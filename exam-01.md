@@ -407,6 +407,10 @@ than scheduled. This suggests that Alaska Airlines was the most punctual
 among the carriers analyzed, performing well in terms of timely
 arrivals.
 
+#### References
+
+1.  <https://stackoverflow.com/questions/66422564/round-numbers-in-r-correctly>
+
 ### Question 4
 
 In this code, we’re working on **identifying the mean temperature at the
@@ -483,8 +487,8 @@ This table provides the mean temperature at each of the three NYC
 airports (JFK, EWR, and LGA) on March 8, 2013:
 
 - **JFK**: The mean temperature was **34.97°F**.
-- **EWR (Newark)**: The mean temperature was **35.31°F**.
-- **LGA (LaGuardia)**: The mean temperature was **36.34°F**.
+- **EWR**: The mean temperature was **35.31°F**.
+- **LGA**: The mean temperature was **36.34°F**.
 
 This gives us insight into the weather conditions on the day with the
 most significant departure delays. Although the temperatures were close
@@ -501,7 +505,26 @@ NYC airports on that day were around **35°F**, but further investigation
 into specific weather events (e.g., storms) may explain why such
 extensive delays occurred.
 
+#### References
+
+1.  <https://stackoverflow.com/questions/39420136/combine-separate-year-and-month-columns-into-single-date-column>
+2.  <https://dplyr.tidyverse.org/reference/mutate-joins.html>
+
 ### Question 5
+
+The code filters flights to exclude those with missing departure delays,
+then categorizes the remaining flights into *four time intervals* based
+on their departure times using the `case_when()` function. It groups the
+data by these intervals, calculating the total number of flights and the
+count of delayed flights for each interval. The proportion of delayed
+flights is calculated using the formula:
+
+$$
+\text{Proportion of Delayed Flights} = \frac{\text{Delayed Flights}}{\text{Total Flights}}
+$$
+
+Finally, it sorts the intervals in chronological order to provide a
+clear view of how delays fluctuate throughout the day.
 
 ``` r
 # Define the time intervals
@@ -517,7 +540,7 @@ flights_time_intervals <- flights %>%
   summarise(
     total_flights = n(),                               # Total number of flights in each interval
     delayed_flights = sum(dep_delay > 0, na.rm = TRUE), # Count flights delayed
-    prop_delayed = delayed_flights / total_flights      # Proportion of delayed flights
+    prop_delayed = round(delayed_flights / total_flights, 4)      # Proportion of delayed flights
   ) %>%
   arrange(time_interval)  # Sort by time interval
 
@@ -532,9 +555,110 @@ flights_time_intervals
     ## 3 6:01am-12pm          122082           30178        0.247
     ## 4 6:01pm-12am           76357           43550        0.570
 
+#### Key Findings:
+
+**Early Morning (12:01am-6am):**  
+This period shows the lowest proportion of delayed flights at 16.6%.
+Fewer flights and reduced airport congestion during the early hours may
+contribute to this.
+
+**Morning (6:01am-12pm):**  
+The proportion of delayed flights rises to 24.7%. This could be due to
+increased air traffic as more flights depart during the morning, leading
+to slight operational delays.
+
+**Afternoon (12:01pm-6pm):**  
+During this period, delays become more frequent, with 44% of flights
+delayed. The afternoon tends to have heavy air traffic, and delays from
+earlier in the day can accumulate.
+
+**Evening (6:01pm-12am):**  
+The likelihood of delay is highest in the evening, with 57% of flights
+experiencing delays. This suggests that delays compound as the day
+progresses, resulting in more late departures by evening.
+
+#### Conclusion:
+
+The analysis shows that the chances of a flight being delayed at
+departure steadily increase throughout the day. Early morning flights
+are the least likely to be delayed, while flights departing in the
+evening face a much higher probability of delay. This pattern is likely
+due to the buildup of delays from earlier flights, increasing
+congestion, and operational challenges during peak travel times.
+
+#### References
+
+1.  <https://stackoverflow.com/a/64980831>
+
 ### Question 6
 
-\[Enter code and narrative here.\]
+The code identifies the flight with the longest air time from the
+`flights` dataset while also retrieving relevant details about the
+aircraft from the `planes` dataset, including its seating capacity.
+
+First, the code extracts essential information regarding the longest
+flight, such as the flight number, destination, air time, year, month,
+and day of departure. Next, it filters the `planes` dataset to find the
+corresponding aircraft by matching the tail number of the longest flight
+(`longest_flight$tailnum`), ensuring that the correct plane is
+referenced. Finally, the code utilizes the `mutate` function to combine
+the information about the longest flight with the number of seats,
+adding a new column called `seats` to the `longest_flight_info` data
+frame.
+
+``` r
+# Find the flight with the longest air time
+longest_flight <- flights %>% 
+  filter(!is.na(air_time)) %>% 
+  arrange(desc(air_time)) %>% 
+  slice(1)
+
+# Retrieve information about the longest flight
+longest_flight_info <- longest_flight %>%
+  select(flight = flight, 
+         destination = dest, 
+         air_time, 
+         year, month, day)
+
+# Retrieve number of seats for the corresponding plane
+plane_info <- planes %>%
+  filter(tailnum == longest_flight$tailnum) %>%  # Match by tail number
+  select(seats)
+
+# Combine the information
+result <- longest_flight_info %>%
+  mutate(seats = plane_info$seats)  # Add the number of seats
+
+result
+```
+
+    ## # A tibble: 1 × 7
+    ##   flight destination air_time  year month   day seats
+    ##    <int> <chr>          <dbl> <int> <int> <int> <int>
+    ## 1     15 HNL              695  2013     3    17   292
+
+#### Interpretation
+
+**How long is this flight?**
+
+The flight has an air time of **695 minutes**, which translates to
+approximately **11 hours and 35 minutes**. This significant duration
+indicates it is a long-haul flight, reflecting the distance between NYC
+and HNL.
+
+**What city did it fly to?**
+
+The destination of this flight is **HNL**, located in Hawaii.
+
+**How many seats does the plane that flew this flight have?**
+
+The aircraft that operated this flight has a seating capacity of **292
+seats**. This large capacity suggests that the airline is equipped to
+handle a significant number of passengers.
+
+#### References
+
+1.  <https://nycflights13.tidyverse.org/reference/planes.html>
 
 ### Question 7
 

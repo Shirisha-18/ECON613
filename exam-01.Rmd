@@ -242,7 +242,51 @@ The analysis shows that the chances of a flight being delayed at departure stead
 
 ### Question 6
 
-[Enter code and narrative here.]
+The code identifies the flight with the longest air time from the `flights` dataset while also retrieving relevant details about the aircraft from the `planes` dataset, including its seating capacity.
+
+First, the code extracts essential information regarding the longest flight, such as the flight number, destination, air time, year, month, and day of departure. Next, it filters the `planes` dataset to find the corresponding aircraft by matching the tail number of the longest flight (`longest_flight$tailnum`), ensuring that the correct plane is referenced. Finally, the code utilizes the `mutate` function to combine the information about the longest flight with the number of seats, adding a new column called `seats` to the `longest_flight_info` data frame.
+
+```{r longest-flight-info}
+# Find the flight with the longest air time
+longest_flight <- flights %>% 
+  filter(!is.na(air_time)) %>% 
+  arrange(desc(air_time)) %>% 
+  slice(1)
+
+# Retrieve information about the longest flight
+longest_flight_info <- longest_flight %>%
+  select(flight = flight, 
+         destination = dest, 
+         air_time, 
+         year, month, day)
+
+# Retrieve number of seats for the corresponding plane
+plane_info <- planes %>%
+  filter(tailnum == longest_flight$tailnum) %>%  # Match by tail number
+  select(seats)
+
+# Combine the information
+result <- longest_flight_info %>%
+  mutate(seats = plane_info$seats)  # Add the number of seats
+
+result
+```
+#### Interpretation
+
+**How long is this flight?**
+
+The flight has an air time of **695 minutes**, which translates to approximately **11 hours and 35 minutes**. This significant duration indicates it is a long-haul flight, reflecting the distance between NYC and HNL.
+
+**What city did it fly to?**
+
+The destination of this flight is **HNL**, located in Hawaii. 
+
+**How many seats does the plane that flew this flight have?**
+
+The aircraft that operated this flight has a seating capacity of **292 seats**. This large capacity suggests that the airline is equipped to handle a significant number of passengers.
+
+#### References
+1. https://nycflights13.tidyverse.org/reference/planes.html
 
 ### Question 7
 
