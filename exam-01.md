@@ -273,6 +273,11 @@ summary(flights %>% select(dep_delay, arr_delay, distance, air_time))
 
 ### Question 1
 
+To identify the **ten most common flight destinations** from NYC
+airports in 2013, I grouped the flights dataset by the `dest` column and
+counted the number of flights to each destination. After *sorting* the
+results in descending order, I selected the top ten destinations.
+
 ``` r
 flights %>% 
   group_by(dest) %>% 
@@ -297,12 +302,10 @@ flights %>%
     ##  9 MIA          11728
     ## 10 DCA           9705
 
-From the table, we can see that *Chicago O’Hare International Airport
-(ORD)* had the highest number of flights from NYC, followed closely by
-Atlanta Hartsfield-Jackson International Airport (ATL) and Los Angeles
-International Airport (LAX). This indicates that these cities were the
-most popular destinations for travelers flying out of New York City in
-2013.
+From the table, we can see that **ORD** had the highest number of
+flights from NYC, followed closely by **ATL** and **LAX**. This
+indicates that these cities were the most popular destinations for
+travelers flying out of New York City in 2013.
 
 ### Question 2
 
