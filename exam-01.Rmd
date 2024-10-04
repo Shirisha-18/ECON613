@@ -10,7 +10,7 @@ output:
 
 ```{r setup, include = FALSE}
 # set the echo option to FALSE to see how the document looks with the code suppressed
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ## Academic Honesty Statement
@@ -38,8 +38,12 @@ This section allows us to view the entire `flights` dataset from the `nycflights
 
 
 ```{r understand-data}
-#view(flights)
-#?flights
+view(flights)
+?flights
+?weather
+?planes
+?airports
+?airlines
 ```
 
 In this section, we extract the first few rows of the `flights` dataset to get a **glimpse of the data**. 
@@ -61,7 +65,7 @@ HTML(paste0(
 
 #### Exploratory Data Analysis
 
-This section conducts an initial **exploratory analysis** by checking the structure of the `flights` dataset using glimpse, which provides a compact view of the data types and sample values. It counts the number of missing values in each column to identify potential issues with data completeness. Finally, **summary statistics** are generated for key features like departure delay, arrival delay, distance, and airtime, allowing for a better understanding of flight performance and trends.
+This section conducts an initial **exploratory analysis** by checking the structure of the `flights` dataset using glimpse, which provides a compact view of the data types and sample values. It counts the number of **missing values in each column** to identify potential issues with data completeness. Finally, **summary statistics** are generated for key features like departure delay, arrival delay, distance, and airtime, allowing for a better understanding of flight performance and trends.
 
 
 ```{r exploratory-data-analysis}
@@ -75,12 +79,16 @@ sapply(flights, function(x) sum(is.na(x)))
 summary(flights %>% select(dep_delay, arr_delay, distance, air_time))
 ```
 
+#### References
+
+1. https://sebastiansauer.github.io/sum-isna/
+
 ### Question 1
 
 To identify the **ten most common flight destinations** from NYC airports in 2013, I grouped the flights dataset by the `dest` column and counted the number of flights to each destination. After *sorting* the results in descending order, I selected the top ten destinations.
 
 
-```{r most-common-destinations}
+```{r most-common-destinations, message=FALSE}
 flights %>% 
   group_by(dest) %>% 
   summarise(flight_count = n()) %>% 
@@ -309,7 +317,7 @@ ggplot(contiguous_us_airports, aes(x = lon)) +
   theme_minimal()
 ```
 
-```{r point-density-airports}
+```{r point-density-airports, message=FALSE, warning=FALSE}
 # Create a point density map
 ggplot(data = contiguous_us_airports, aes(x = lon, y = lat)) +
   stat_density_2d(aes(fill = ..level..), 
@@ -368,7 +376,7 @@ Major cities such as New York and Los Angeles which are located near the coasts,
 
 This visualization displays the relationship between flight arrival status ("ontime" or "delayed") and departure delays across three major New York City airports (EWR, JFK, LGA) and two destinations (PHL and RDU) for flights in December 2013. Each boxplot shows the distribution of departure delays for flights that either arrived on time or were delayed. The use of faceting allows us to compare the performance of different airport pairs.
 
-```{r box-plot}
+```{r box-plot, message=FALSE}
 # Filter flights for December 2013 and create arrival status variable
 flights_december <- flights %>%
   filter(month == 12, !is.na(dep_delay), !is.na(arr_delay)) %>%
@@ -393,6 +401,31 @@ The point of this visualization might be to illustrate how departure delays rela
 
 ### Extra Credit
 
-[Enter code and narrative here.]
+The scatter plot provides a visual representation of the relationship between the average daily departure delay and the average daily temperature for flights departing from the three New York City airports: EWR, JFK, and LGA. 
 
 
+```{r regression-plot, , message=FALSE, warning=FALSE}
+# Regression plot to show the relationship between average daily departure delay and temperature
+flights %>%
+  filter(!is.na(dep_delay), origin %in% c("EWR", "JFK", "LGA")) %>%
+  mutate(date = as.Date(time_hour)) %>%
+  left_join(weather, by = c("origin", "time_hour")) %>%
+  group_by(date) %>%
+  summarise(avg_dep_delay = mean(dep_delay, na.rm = TRUE),
+            avg_temp = mean(temp, na.rm = TRUE)) %>%
+  ggplot(aes(x = avg_temp, y = avg_dep_delay)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") +
+  labs(title = "Relationship b/w Departure Delay and Temperature",
+       subtitle = "For NYC Airports",
+       x = "Avg Daily Temperature (°F)",
+       y = "Avg Daily Departure Delay (mins)")
+```
+
+From the graph, we can see a **slight upward trend**, showing that as the average daily temperature goes up, the average departure delay tends to increase as well. This implies that warmer temperatures might be linked to longer flight delays. The blue regression line reinforces this trend, illustrating a **positive slope**. However, the points are spread out around the regression line, suggesting that, although there is a general relationship, <u>other factors likely play a role</u> in influencing the departure delays.
+
+
+#### References
+
+1. https://www.rpubs.com/Katharhy/853651
+2. https://clauswilke.com/dataviz/visualizing-associations.html
