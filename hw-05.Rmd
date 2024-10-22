@@ -13,14 +13,33 @@ library(tidyverse)
 load("data/lego_sales.rda")
 ```
 
+```{r view-data}
+view(lego_sales)
+glimpse(lego_sales)
+
+# Get the head of the data set
+lego_head <- head(lego_sales)
+lego_head
+
+# Get the tail of the data set
+lego_tail <- tail(lego_sales)
+lego_tail
+```
+
+
 ## Exercises
 
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+In this sample, the first three common names of purchasers are **Jackson**, **Jacob** and **Joseph**.
+
+```{r common-first-names}
+lego_sales %>%
+  count(first_name) %>%
+  arrange(desc(n)) %>%
+  slice_max(n, n = 3)
+```
+
 
 ### Exercise 2
 
@@ -28,6 +47,7 @@ Remove this text, and add your answer for Exercise 2 here.
 Add code chunks as needed.
 Don't forget to label your code chunk.
 Do not use spaces in code chunk labels.
+
 
 ### Exercise 3
 
