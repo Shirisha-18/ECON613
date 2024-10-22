@@ -43,10 +43,18 @@ lego_sales %>%
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 2 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+In this sample, the three most common themes of Lego sets purchased are:
+
+1. **Star Wars** (75 purchases)
+2. **Nexo Knights** (64 purchases)
+3. **Gear** and **Mixels** (both with 55 purchases each)
+
+```{r most-common-themes}
+lego_sales %>%
+  count(theme) %>%
+  arrange(desc(n)) %>%
+  slice_max(n, n = 3)
+```
 
 
 ### Exercise 3
