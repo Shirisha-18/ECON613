@@ -76,11 +76,27 @@ lego_sales %>%
 
 ### Exercise 4
 
-...
+```{r age-grouping}
+lego_sales %>%
+  mutate(age_group = case_when(
+    age <= 18 ~ "18 and under",
+    age >= 19 & age <= 25 ~ "19 - 25",
+    age >= 26 & age <= 35 ~ "26 - 35",
+    age >= 36 & age <= 50 ~ "36 - 50",
+    age > 50 ~ "51 and over"
+  )) %>%
+  #Show sample data with selected columns
+  select(first_name, last_name, age, age_group)
+```
 
 ### Exercise 5
 
-...
+
+
+```{r }
+
+```
+
 
 ### Exercise 6
 
