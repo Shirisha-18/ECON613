@@ -110,9 +110,7 @@ lego_sales %>%
 
 ### Exercise 6
 
-The total amount spent by the age group is:
-
-- **36 - 50** ($9,532.87)
+The total amount spent by the age group is **36 - 50** ($9,532.87)
 
 ```{r most-money-spent}
 lego_sales %>%
@@ -125,7 +123,17 @@ lego_sales %>%
 
 ### Exercise 7
 
-...
+The Lego theme that has made the most money for Lego is **Star Wars**
+
+```{r most-money-earned}
+lego_sales %>%
+  group_by(theme) %>%
+  summarise(total_revenue = sum(us_price * quantity)) %>%
+  arrange(desc(total_revenue)) %>%
+  slice_max(total_revenue, n = 1)
+
+```
+
 
 ### Exercise 8
 
