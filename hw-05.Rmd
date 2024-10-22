@@ -164,7 +164,7 @@ The area code that has spent the most money on Legos, excluding invalid entries,
 
 ### Exercise 9
 
-#### a. What is the average price of Lego sets purchased by each age group?
+#### What is the average price of Lego sets purchased by each age group?
 
 
 ```{r avg-price-age-group}
@@ -195,24 +195,4 @@ ggplot(average_price_by_age, aes(x = age_group, y = average_price, group = 1, co
 ```
 
 From this visualization, we can observe that the **36 - 50** age group has the highest average price which is nearly **$31**, while the **18 and under** age group has the lowest average price around **$20**.
-
-#### b. How do the total purchases of Lego sets compare between male and female purchasers?
-
-```{r test}
-# Calculate total purchases by year
-trend_of_purchases <- lego_sales %>%
-  group_by(year) %>%  # Group by year
-  summarise(total_purchases = sum(quantity, na.rm = TRUE)) %>%  # Sum quantities for total purchases
-  arrange(year)
-
-# Create a line graph to visualize the trend of purchases over the years
-ggplot(trend_of_purchases, aes(x = year, y = total_purchases)) +
-  geom_line(color = "blue", size = 1.2) +  # Line for the trend
-  geom_point(color = "red", size = 3) +    # Points for each year
-  labs(title = "Trend of Lego Purchases Over the Years",
-       x = "Year",
-       y = "Total Purchases") +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5))  # Center the title
-```
 
