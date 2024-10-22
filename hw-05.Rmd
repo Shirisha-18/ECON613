@@ -59,10 +59,20 @@ lego_sales %>%
 
 ### Exercise 3
 
-Remove this text, and add your answer for Exercise 3 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+Among the most common themes of Lego sets purchased, the most common subtheme is:
+
+- **The Force Awakens** (15 purchases)
+
+
+```{r most-common-subtheme}
+lego_sales %>%
+  group_by(theme) %>%
+  mutate(theme_count  = n()) %>%  
+  ungroup() %>%
+  filter(theme_count  == max(theme_count )) %>%  
+  count(subtheme) %>%
+  slice_max(n, n = 1)
+```
 
 ### Exercise 4
 
