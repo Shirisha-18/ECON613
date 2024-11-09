@@ -7,12 +7,21 @@ output: github_document
 
 ## Load packages and data
 
-```{r load-packages, message = FALSE}
+```{r load-packages, message = FALSE, warning= FALSE}
 library(tidyverse)
+library(robotstxt)
+library(rvest)
 library(scales)
 ```
 
+```{r bot-check}
+library(robotstxt)
+paths_allowed("https://www.opensecrets.org")
+```
+
 ## Exercises
+
+
 
 ### Exercise 1
 
