@@ -12,6 +12,8 @@ library(rvest)
 library(scales)
 library(stringr)
 library(dplyr)
+library(tidyr)
+library(ggplot2)
 ```
 
 ``` r
@@ -234,5 +236,41 @@ head(pac_all, 10)
 2.  <https://stackoverflow.com/questions/10294284/remove-all-special-characters-from-a-string-in-r>
 
 ### Exercise 4
+
+``` r
+# Filter data for Canada and Mexico, group by year and country
+can_vs_mexico <- pac_all %>%
+  filter(country %in% c("Canada", "Mexico")) %>%
+  group_by(year, country) %>%
+  summarize(total_contributions = sum(total, na.rm = TRUE))
+```
+
+    ## `summarise()` has grouped output by 'year'. You can override using the
+    ## `.groups` argument.
+
+``` r
+# Create the line plot
+ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
+  geom_line(size = 1) +                   # Line plot with line width = 1
+  labs(
+    title = "Total Contributions from Foreign-connected PACs in Canada and Mexico",
+    subtitle = "Comparison of Contributions in Canada and Mexico Over the Years",
+    x = "Year",
+    y = "Total Contributions ($)",
+    color = "Country"
+  ) +
+  theme_minimal() +                       
+  scale_color_manual(values = c("Canada" = "lightblue", "Mexico" = "rosybrown"))  
+```
+
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+![](exam-02-shirisha-biyyala_files/figure-gfm/line-plot-1.png)<!-- -->
+
+#### Interpretation:
 
 ### Exercise 5

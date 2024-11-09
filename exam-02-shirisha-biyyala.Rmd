@@ -14,6 +14,8 @@ library(rvest)
 library(scales)
 library(stringr)
 library(dplyr)
+library(tidyr)
+library(ggplot2)
 ```
 
 ```{r bot-check}
@@ -173,7 +175,6 @@ pac_all <- pac_all %>%
   )
 ```
 
-
 #### References:
 
 1. https://www.geeksforgeeks.org/remove-all-special-characters-from-string-in-r/
@@ -182,6 +183,34 @@ pac_all <- pac_all %>%
 ### Exercise 4
 
 
+```{r line-plot}
+# Filter data for Canada and Mexico, group by year and country
+can_vs_mexico <- pac_all %>%
+  filter(country %in% c("Canada", "Mexico")) %>%
+  group_by(year, country) %>%
+  summarize(total_contributions = sum(total, na.rm = TRUE))
+
+# Create the line plot
+ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
+  geom_line(size = 1) +                   # Line plot with line width = 1
+  labs(
+    title = "Total Contributions from Foreign-connected PACs in Canada and Mexico",
+    subtitle = "Comparison of Contributions in Canada and Mexico Over the Years",
+    x = "Year",
+    y = "Total Contributions ($)",
+    color = "Country"
+  ) +
+  theme_minimal() +                       
+  scale_color_manual(values = c("Canada" = "lightblue", "Mexico" = "rosybrown"))  
+```
+
+#### Interpretation:
+
 
 ### Exercise 5
+
+```{r us-uk-comparison-visual}
+
+
+```
 
