@@ -74,15 +74,8 @@ scrape_pac <- function(url) {
 
 url_2022 <- "https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2022"
 pac_2022 <- scrape_pac(url_2022)
-```
 
-    ## Warning: The `fill` argument of `html_table()` is deprecated as of rvest 1.0.0.
-    ## ℹ An improved algorithm fills by default so it is no longer needed.
-    ## This warning is displayed once every 8 hours.
-    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    ## generated.
 
-``` r
 url_2020 <- "https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2020"
 pac_2020 <- scrape_pac(url_2020)
 
@@ -122,18 +115,7 @@ write_csv(pac_all, file = "pac-all.csv")
 ``` r
 # Load pac-all.csv
 pac_all <- read_csv("pac-all.csv")
-```
 
-    ## Rows: 2638 Columns: 6
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr (5): name, country_parent, total, dems, repubs
-    ## dbl (1): year
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 # Data description
 head(pac_all)
 ```
@@ -205,11 +187,20 @@ head(pac_all, 10)
 
 ``` r
 # Convert contribution amounts to numeric
+# Clean the columns: remove '$' and ',' then convert to numeric
 pac_all <- pac_all %>%
   mutate(
-    total = as.numeric(gsub("[^0-9.-]", "", total)),  # Remove non-numeric characters and convert to numeric
-    dems = as.numeric(gsub("[^0-9.-]", "", dems)),    
-    repubs = as.numeric(gsub("[^0-9.-]", "", repubs)) 
+    total = str_remove_all(total, "\\$"),  # Remove dollar sign
+    total = str_remove_all(total, ","),    # Remove commas 
+    total = as.numeric(total),             # Convert to numeric
+    
+    dems = str_remove_all(dems, "\\$"),    
+    dems = str_remove_all(dems, ","),      
+    dems = as.numeric(dems),               
+    
+    repubs = str_remove_all(repubs, "\\$"),  
+    repubs = str_remove_all(repubs, ","),    
+    repubs = as.numeric(repubs)             
   )
 
 # Print the top 10 rows to verify the changes
@@ -243,12 +234,7 @@ can_vs_mexico <- pac_all %>%
   filter(country %in% c("Canada", "Mexico")) %>%
   group_by(year, country) %>%
   summarize(total_contributions = sum(total, na.rm = TRUE))
-```
 
-    ## `summarise()` has grouped output by 'year'. You can override using the
-    ## `.groups` argument.
-
-``` r
 # Create the line plot
 ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
   geom_line(size = 1) +                   # Line plot with line width = 1
@@ -263,14 +249,51 @@ ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
   scale_color_manual(values = c("Canada" = "lightblue", "Mexico" = "rosybrown"))  
 ```
 
-    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    ## ℹ Please use `linewidth` instead.
-    ## This warning is displayed once every 8 hours.
-    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    ## generated.
-
 ![](exam-02-shirisha-biyyala_files/figure-gfm/line-plot-1.png)<!-- -->
 
 #### Interpretation:
 
 ### Exercise 5
+
+``` r
+# Step 1: Filter for UK contributions
+pac_all_uk <- pac_all %>%
+  filter(country == "United Kingdom")
+
+# Step 2: Reshape data to long format
+pac_all_uk_long <- pac_all_uk %>%
+  pivot_longer(cols = c(dems, repubs), 
+               names_to = "party", 
+               values_to = "amount")
+
+# Step 3: Group by year and party, then summarize the total contributions
+pac_all_uk_summary <- pac_all_uk_long %>%
+  group_by(year, party) %>%
+  summarize(total_contributions = sum(amount, na.rm = TRUE), .groups = "drop")
+
+# Step 4: Define color mapping
+color_mapping <- c(
+  dems = "blue",  # Blue for Democrat
+  repubs = "red"  # Red for Republican
+)
+
+# Step 5: Create the plot
+ggplot(pac_all_uk_summary, aes(x = year, y = total_contributions, color = party, group = party)) +
+  geom_line(size = 1) +  # Line plot for contributions
+  scale_y_continuous(labels = label_dollar(scale = 1e-6, suffix = "M")) +  # Format y-axis labels in millions
+  labs(
+    title = "Contribution to US politics from UK-Connected PACs",
+    subtitle = "By party, over time",
+    x = "Year",
+    y = "Amount",
+    color = "Party"
+  ) +
+  scale_color_manual(values = color_mapping) +  # Use the color_mapping
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+    ## Warning: No shared levels found between `names(values)` of the manual scale and the
+    ## data's colour values.
+
+![](exam-02-shirisha-biyyala_files/figure-gfm/us-uk-comparison-visual-1.png)<!-- -->

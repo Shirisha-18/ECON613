@@ -25,7 +25,7 @@ paths_allowed("https://www.opensecrets.org")
 
 ## Exercises
 
-```{r scrape-pac}
+```{r scrape-pac, message = FALSE, warning= FALSE}
 # function: scrape_pac ---------------------------------------------------------
 
 scrape_pac <- function(url) {
@@ -105,13 +105,13 @@ write_csv(pac_all, file = "pac-all.csv")
 ```
 
 
-#### References:
+#### References
 
 1. https://www.geeksforgeeks.org/extract-first-or-last-n-characters-from-string-in-r/
 
 ### Exercise 1
 
-```{r load-data}
+```{r load-data, message = FALSE, warning= FALSE}
 # Load pac-all.csv
 pac_all <- read_csv("pac-all.csv")
 
@@ -129,7 +129,7 @@ n_obs_vars
 
 ### Exercise 2
 
-```{r delimeter-cleaning}
+```{r delimeter-cleaning, message = FALSE, warning= FALSE}
 # Use separate_wider_delim() to split the country_parent column
 pac_all <- pac_all %>%
   separate_wider_delim(country_parent, 
@@ -144,20 +144,8 @@ head(pac_all, 10)
 
 ### Exercise 3
 
-```{r remove-spl-char}
+```{r remove-spl-char, message = FALSE, warning= FALSE}
 # Convert contribution amounts to numeric
-pac_all <- pac_all %>%
-  mutate(
-    total = as.numeric(gsub("[^0-9.-]", "", total)),  # Remove non-numeric characters and convert to numeric
-    dems = as.numeric(gsub("[^0-9.-]", "", dems)),    
-    repubs = as.numeric(gsub("[^0-9.-]", "", repubs)) 
-  )
-
-# Print the top 10 rows to verify the changes
-head(pac_all, 10)
-```
-
-```{r remove-spl-using-hint, eval=FALSE, echo= FALSE}
 # Clean the columns: remove '$' and ',' then convert to numeric
 pac_all <- pac_all %>%
   mutate(
@@ -173,6 +161,9 @@ pac_all <- pac_all %>%
     repubs = str_remove_all(repubs, ","),    
     repubs = as.numeric(repubs)             
   )
+
+# Print the top 10 rows to verify the changes
+head(pac_all, 10)
 ```
 
 #### References:
@@ -183,7 +174,7 @@ pac_all <- pac_all %>%
 ### Exercise 4
 
 
-```{r line-plot}
+```{r line-plot, message = FALSE, warning= FALSE}
 # Filter data for Canada and Mexico, group by year and country
 can_vs_mexico <- pac_all %>%
   filter(country %in% c("Canada", "Mexico")) %>%
@@ -194,7 +185,7 @@ can_vs_mexico <- pac_all %>%
 ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
   geom_line(size = 1) +                   # Line plot with line width = 1
   labs(
-    title = "Total Contributions from Foreign-connected PACs in Canada and Mexico",
+    title = "Total Contributions from Foreign-connected PACs",
     subtitle = "Comparison of Contributions in Canada and Mexico Over the Years",
     x = "Year",
     y = "Total Contributions ($)",
@@ -204,13 +195,44 @@ ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
   scale_color_manual(values = c("Canada" = "lightblue", "Mexico" = "rosybrown"))  
 ```
 
-#### Interpretation:
+#### Interpretation
 
 
 ### Exercise 5
 
-```{r us-uk-comparison-visual}
+```{r us-uk-comparison-visual, message = FALSE, warning= FALSE}
 
+# Step 1: Filter for UK contributions
+pac_all_uk <- pac_all %>%
+  filter(country == "UK", year <= 2020)
 
+# Step 2: Reshape data from wide to long format (pivot longer)
+pac_all_uk_long <- pac_all_uk %>%
+  pivot_longer(cols = c(dems, repubs), 
+               names_to = "party", 
+               values_to = "amount")
+
+# Step 3: Group by year and party, then summarize total contributions
+pac_all_uk_summary <- pac_all_uk_long %>%
+  group_by(year, party) %>%
+  summarize(total_contributions = sum(amount, na.rm = TRUE)) %>%
+  ungroup()
+
+# Step 4: Plot the data
+ggplot(pac_all_uk_summary, aes(x = year, y = total_contributions, color = party, group = party)) +
+  geom_line(size = 1.5) +  # Line plot for contributions
+  scale_y_continuous(labels = label_dollar(scale = 1e-6, suffix = "M")) +  # Format y-axis labels in millions
+  labs(
+    title = "Contribution to US politics from UK-Connected PACs",
+    subtitle = "By party, over time",
+    x = "Year",
+    y = "Amount",
+    color = "Party"
+  ) +
+  scale_color_manual(values = c("dems" = "blue", "repubs" = "red"), 
+                     labels = c("Democrat", "Republican")) +
+  theme_minimal() +
+  theme(legend.position = "right")
 ```
 
+#### Interpretation

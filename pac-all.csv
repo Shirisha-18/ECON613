@@ -304,8 +304,8 @@ UnionBanCal Corp,Japan/Mitsubishi UFJ Financial Group,"$13,500","$3,500","$10,00
 United Water Resources (SUEZ SA),France/SUEZ SA,"$18,150","$14,650","$3,500",2002
 Universal Studios (Vivendi Universal),France/Vivendi Universal,"$136,500","$65,500","$71,000",2002
 US Surgical Corp (Tyco International),Ireland/Tyco International,$0,$0,$0,2002
-Wackenhut Corp (Group 4 Falck),Denmark/Group 4 Falck,"$20,250","$4,250","$16,000",2002
 Wackenhut Corp (Group 4 Falck),Denmark/Group 4 Falck,$0,$0,$0,2002
+Wackenhut Corp (Group 4 Falck),Denmark/Group 4 Falck,"$20,250","$4,250","$16,000",2002
 Westfield Corp,Australia/Westfield Group of Australia,"$23,619","$21,619","$2,000",2002
 Westinghouse Electric (BNFL PLC),UK/British Nuclear Fuels PLC,"$5,250",$500,"$4,750",2002
 Wexler & Walker Public Policy Assoc (WPP Group),UK/WPP Group,"$93,500","$34,000","$59,500",2002
@@ -466,8 +466,8 @@ XL America,UK/XL Capital,"$3,000",$0,"$3,000",2004
 Zurich Insurance (Zurich Financial Services),Switzerland/Zurich Financial Services,"$195,869","$59,000","$135,369",2004
 7-Eleven,Japan/Seven & I Holdings,$0,$0,$0,2006
 ABB Group,Switzerland/Asea Brown Boveri,"$9,250","$2,250","$6,500",2006
-Accenture (Accenture),UK/Accenture plc,"$313,380","$115,680","$195,700",2006
 Accenture (Accenture),UK/Accenture plc,$0,$0,$0,2006
+Accenture (Accenture),UK/Accenture plc,"$313,380","$115,680","$195,700",2006
 ACE INA,UK/ACE Ltd,"$108,000","$33,000","$75,000",2006
 Acuson Corp (Siemens AG),Germany/Siemens AG,$0,$0,$0,2006
 AEGON USA,Netherlands/Aegon NV,"$153,500","$58,000","$94,000",2006
@@ -631,8 +631,8 @@ ZLB Behring,Australia/CSL Ltd,"$3,500",$0,"$3,500",2006
 Zurich Insurance (Zurich Financial Services),Switzerland/Zurich Financial Services,"$211,000","$58,500","$149,500",2006
 7-Eleven,Japan/Seven & I Holdings,"$9,500","$2,000","$7,500",2008
 ABB Group,Switzerland/Asea Brown Boveri,"$18,000","$8,000","$10,000",2008
-Accenture (Accenture),UK/Accenture plc,"$347,750","$189,750","$158,000",2008
 Accenture (Accenture),UK/Accenture plc,$0,$0,$0,2008
+Accenture (Accenture),UK/Accenture plc,"$347,750","$189,750","$158,000",2008
 ACE INA,Switzerland/ACE Ltd,"$171,500","$82,500","$89,000",2008
 Acuson Corp (Siemens AG),Germany/Siemens AG,$0,$0,$0,2008
 AEGON USA,Netherlands/Aegon NV,"$210,497","$107,997","$102,500",2008
@@ -948,8 +948,8 @@ Metro-Goldwyn-Mayer (Sony Corp),Japan/Sony Corp,"-$2,500",$0,"-$2,500",2010
 Millennium Pharmaceuticals (Takeda Pharmaceutical Co),Japan/Takeda Pharmaceutical Co,"$28,000","$22,000","$6,000",2010
 Miller Brewing (SABMiller),UK/SABMiller PLC,$0,$0,$0,2010
 MillerCoors LLC (SABMiller),UK/SABMiller PLC,"$205,500","$97,500","$107,000",2010
-National Grid USA (National Grid plc),UK/National Grid plc,"$141,350","$121,100","$18,250",2010
 National Grid USA (National Grid plc),UK/National Grid plc,$500,$500,$0,2010
+National Grid USA (National Grid plc),UK/National Grid plc,"$141,350","$121,100","$18,250",2010
 Nestle Purina PetCare (Nestle SA),Switzerland/Nestle SA,"$25,500","$4,500","$21,000",2010
 Nestle Waters North America (Nestle SA),Switzerland/Nestle,"$19,500","$10,500","$8,000",2010
 Nomura Holding America,Japan/Nomura Holdings,$0,$0,$0,2010
@@ -1488,15 +1488,15 @@ Willis North America,UK/Willis Group Holdings,"$5,500","$1,000","$4,500",2014
 XL America,Ireland/XL Group PLC,$0,$0,$0,2014
 Zurich Insurance (Zurich Insurance Group),Switzerland/Zurich Insurance Group,"$188,500","$100,000","$88,500",2014
 7-Eleven,Japan/Seven & I Holdings,$0,$0,$0,2016
-ABB Group (ABB Group),Switzerland/Asea Brown Boveri,"$11,000","$1,000","$10,000",2016
 ABB Group (ABB Group),Switzerland/Asea Brown Boveri,"$9,500","$7,000","$2,500",2016
+ABB Group (ABB Group),Switzerland/Asea Brown Boveri,"$11,000","$1,000","$10,000",2016
 Accenture (Accenture),Ireland/Accenture plc,"$326,000","$124,500","$201,500",2016
 Advance America Cash Advance Centers (Grupo Salinas),Mexico/Grupo Salinas,"$82,050","$33,000","$49,050",2016
 Air Liquide America,France/L'Air Liquide SA,"$35,000","$9,500","$24,000",2016
 Airbus Group,Netherlands/Airbus Group,"$167,450","$31,500","$135,950",2016
 Alkermes Inc,Ireland/Alkermes Plc,"$121,700","$25,200","$96,500",2016
-Allergan Inc (Allergan PLC),Ireland/Allergan PLC,"$152,000","$29,000","$123,000",2016
 Allergan Inc (Allergan PLC),Ireland/Allergan PLC,"$37,596","$2,000","$35,596",2016
+Allergan Inc (Allergan PLC),Ireland/Allergan PLC,"$152,000","$29,000","$123,000",2016
 Allianz of America (Allianz),Germany/Allianz AG Holding,"$86,600","$21,850","$64,750",2016
 Altice USA (Altice NV),Netherlands/Altice NV,"$62,900","$48,900","$14,000",2016
 AMG Vanadium,Netherlands/AMG Advanced Metallurgical Group,$500,$0,$500,2016
@@ -2094,8 +2094,8 @@ Intelsat US,Luxembourg/Intelsat Holdings,"$16,500","$8,500","$8,000",2020
 Intergraph Corp,Sweden/Hexagon AB,"$4,800",$0,"$4,800",2020
 Ipsen Biopharmaceuticals,France/Ipsen SA,$0,$0,$0,2020
 ITG Brands,UK/Imperial Brands,"$86,500","$14,000","$71,500",2020
-Jackson National Life Insurance (Prudential PLC),UK/Prudential PLC,"$201,000","$59,000","$142,000",2020
 Jackson National Life Insurance (Prudential PLC),UK/Prudential PLC,"$110,500","$30,000","$80,500",2020
+Jackson National Life Insurance (Prudential PLC),UK/Prudential PLC,"$201,000","$59,000","$142,000",2020
 JBS USA,Brazil/JBS SA,"$125,500","$18,000","$107,500",2020
 John Hancock Life Insurance,Canada/Manulife Financial,"$100,500","$54,500","$46,000",2020
 Johnson Controls (Johnson Controls International),Ireland/Johnson Controls International,"$276,400","$129,400","$147,000",2020
@@ -2523,8 +2523,8 @@ Heineken USA,Netherlands/L'Arche Green NV,"$25,000","$13,000","$12,000",2024
 Herbalife International of America,UK/Herbalife Nutrition,"$26,000","$6,000","$20,000",2024
 Holcim US (Holcim Group),Switzerland/Holcim Group,"$16,700","$9,500","$7,200",2024
 Horizon Therapeutics (Amgen Inc),Ireland/Horizon Pharma PLC,"$103,000","$49,500","$51,000",2024
-HSBC North America (HSBC Holdings),UK/HSBC Holdings,"$128,500","$70,000","$58,500",2024
 HSBC North America (HSBC Holdings),UK/HSBC Holdings,"$12,500","$7,500","$5,000",2024
+HSBC North America (HSBC Holdings),UK/HSBC Holdings,"$128,500","$70,000","$58,500",2024
 IDEMIA Identity & Security (IDEMIA),France/IDEMIA,"$18,000","$3,500","$14,500",2024
 IGT Global Solutions,Italy/B&D Holding Di Marco Drago e C Sapa,"$30,400","$25,400","$5,000",2024
 Infineon Technologies,Germany/Infineon Technologies AG,"$12,000","$5,500","$5,500",2024
