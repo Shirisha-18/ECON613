@@ -155,7 +155,7 @@ pac_all <- pac_all %>%
 head(pac_all, 10)
 ```
 
-```{r remove-spl-using-hint, eval=FALSE}
+```{r remove-spl-using-hint, eval=FALSE, echo= FALSE}
 # Clean the columns: remove '$' and ',' then convert to numeric
 pac_all <- pac_all %>%
   mutate(

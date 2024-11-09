@@ -10,6 +10,8 @@ library(tidyverse)
 library(robotstxt)
 library(rvest)
 library(scales)
+library(stringr)
+library(dplyr)
 ```
 
 ``` r
@@ -167,38 +169,70 @@ n_obs_vars
 
     ## The dataset has 2638 observations and 6 variables.
 
-#### Data Cleaning
-
-``` r
-# Separate country_parent into two columns
-pac_all <- pac_all %>%
-  separate(country_parent, into = c("country", "parent_company"), sep = "/", extra = "merge")
-
-# Convert contribution amounts to numeric
-pac_all <- pac_all %>%
-  mutate(
-    total = as.numeric(gsub("[^0-9.-]", "", total)),
-    dems = as.numeric(gsub("[^0-9.-]", "", dems)),
-    repubs = as.numeric(gsub("[^0-9.-]", "", repubs))
-  )
-```
+## Data Cleaning
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 2 here. Add code
-chunks as needed. Don’t forget to label your code chunk. Do not use
-spaces in code chunk labels.
+``` r
+# Use separate_wider_delim() to split the country_parent column
+pac_all <- pac_all %>%
+  separate_wider_delim(country_parent, 
+                       delim = "/", 
+                       names = c("country", "parent_company"), 
+                       too_many = "merge")
+
+# Print the top 10 rows to check the result
+head(pac_all, 10)
+```
+
+    ## # A tibble: 10 × 7
+    ##    name                          country parent_company total dems  repubs  year
+    ##    <chr>                         <chr>   <chr>          <chr> <chr> <chr>  <dbl>
+    ##  1 7-Eleven                      Japan   Ito-Yokado     $8,5… $1,5… $7,000  2000
+    ##  2 ABB Group                     Switze… Asea Brown Bo… $46,… $17,… $28,5…  2000
+    ##  3 Accenture                     UK      Accenture plc  $75,… $23,… $52,9…  2000
+    ##  4 ACE INA                       UK      ACE Group      $38,… $12,… $26,0…  2000
+    ##  5 Acuson Corp (Siemens AG)      Germany Siemens AG     $2,0… $2,0… $0      2000
+    ##  6 Adtranz (DaimlerChrysler)     Germany DaimlerChrysl… $10,… $10,… $500    2000
+    ##  7 AE Staley Manufacturing (Tat… UK      Tate & Lyle    $24,… $10,… $14,0…  2000
+    ##  8 AEGON USA (AEGON NV)          Nether… Aegon NV       $58,… $10,… $47,7…  2000
+    ##  9 AIM Management Group          UK      AMVESCAP       $25,… $10,… $15,0…  2000
+    ## 10 Air Liquide America           France  L'Air Liquide… $0    $0    $0      2000
 
 ### Exercise 3
 
-Remove this text, and add your answer for Exercise 3 here. Add code
-chunks as needed. Don’t forget to label your code chunk. Do not use
-spaces in code chunk labels.
+``` r
+# Convert contribution amounts to numeric
+pac_all <- pac_all %>%
+  mutate(
+    total = as.numeric(gsub("[^0-9.-]", "", total)),  # Remove non-numeric characters and convert to numeric
+    dems = as.numeric(gsub("[^0-9.-]", "", dems)),    
+    repubs = as.numeric(gsub("[^0-9.-]", "", repubs)) 
+  )
+
+# Print the top 10 rows to verify the changes
+head(pac_all, 10)
+```
+
+    ## # A tibble: 10 × 7
+    ##    name                          country parent_company total  dems repubs  year
+    ##    <chr>                         <chr>   <chr>          <dbl> <dbl>  <dbl> <dbl>
+    ##  1 7-Eleven                      Japan   Ito-Yokado      8500  1500   7000  2000
+    ##  2 ABB Group                     Switze… Asea Brown Bo… 46000 17000  28500  2000
+    ##  3 Accenture                     UK      Accenture plc  75984 23000  52984  2000
+    ##  4 ACE INA                       UK      ACE Group      38500 12500  26000  2000
+    ##  5 Acuson Corp (Siemens AG)      Germany Siemens AG      2000  2000      0  2000
+    ##  6 Adtranz (DaimlerChrysler)     Germany DaimlerChrysl… 10500 10000    500  2000
+    ##  7 AE Staley Manufacturing (Tat… UK      Tate & Lyle    24000 10000  14000  2000
+    ##  8 AEGON USA (AEGON NV)          Nether… Aegon NV       58250 10500  47750  2000
+    ##  9 AIM Management Group          UK      AMVESCAP       25000 10000  15000  2000
+    ## 10 Air Liquide America           France  L'Air Liquide…     0     0      0  2000
+
+#### References:
+
+1.  <https://www.geeksforgeeks.org/remove-all-special-characters-from-string-in-r/>
+2.  <https://stackoverflow.com/questions/10294284/remove-all-special-characters-from-a-string-in-r>
 
 ### Exercise 4
 
-…
-
 ### Exercise 5
-
-…
