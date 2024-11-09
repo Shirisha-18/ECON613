@@ -12,6 +12,8 @@ library(tidyverse)
 library(robotstxt)
 library(rvest)
 library(scales)
+library(stringr)
+library(dplyr)
 ```
 
 ```{r bot-check}
@@ -121,41 +123,65 @@ n_obs_vars <- str_glue("The dataset has {nrow(pac_all)} observations and {ncol(p
 n_obs_vars
 ```
 
-#### Data Cleaning
+## Data Cleaning
 
-```{r cleaning-data}
-# Separate country_parent into two columns
+### Exercise 2
+
+```{r delimeter-cleaning}
+# Use separate_wider_delim() to split the country_parent column
 pac_all <- pac_all %>%
-  separate(country_parent, into = c("country", "parent_company"), sep = "/", extra = "merge")
+  separate_wider_delim(country_parent, 
+                       delim = "/", 
+                       names = c("country", "parent_company"), 
+                       too_many = "merge")
 
+# Print the top 10 rows to check the result
+head(pac_all, 10)
+```
+
+
+### Exercise 3
+
+```{r remove-spl-char}
 # Convert contribution amounts to numeric
 pac_all <- pac_all %>%
   mutate(
-    total = as.numeric(gsub("[^0-9.-]", "", total)),
-    dems = as.numeric(gsub("[^0-9.-]", "", dems)),
-    repubs = as.numeric(gsub("[^0-9.-]", "", repubs))
+    total = as.numeric(gsub("[^0-9.-]", "", total)),  # Remove non-numeric characters and convert to numeric
+    dems = as.numeric(gsub("[^0-9.-]", "", dems)),    
+    repubs = as.numeric(gsub("[^0-9.-]", "", repubs)) 
+  )
+
+# Print the top 10 rows to verify the changes
+head(pac_all, 10)
+```
+
+```{r remove-spl-using-hint, eval=FALSE}
+# Clean the columns: remove '$' and ',' then convert to numeric
+pac_all <- pac_all %>%
+  mutate(
+    total = str_remove_all(total, "\\$"),  # Remove dollar sign
+    total = str_remove_all(total, ","),    # Remove commas 
+    total = as.numeric(total),             # Convert to numeric
+    
+    dems = str_remove_all(dems, "\\$"),    
+    dems = str_remove_all(dems, ","),      
+    dems = as.numeric(dems),               
+    
+    repubs = str_remove_all(repubs, "\\$"),  
+    repubs = str_remove_all(repubs, ","),    
+    repubs = as.numeric(repubs)             
   )
 ```
 
 
-### Exercise 2
+#### References:
 
-Remove this text, and add your answer for Exercise 2 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
-
-### Exercise 3
-
-Remove this text, and add your answer for Exercise 3 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+1. https://www.geeksforgeeks.org/remove-all-special-characters-from-string-in-r/
+2. https://stackoverflow.com/questions/10294284/remove-all-special-characters-from-a-string-in-r
 
 ### Exercise 4
 
-...
+
 
 ### Exercise 5
 
-...
