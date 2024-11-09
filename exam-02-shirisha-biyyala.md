@@ -21,64 +21,90 @@ paths_allowed("https://www.opensecrets.org")
 
     ## [1] TRUE
 
-``` r
-url <- "https://www.gov.scot/publications/coronavirus-covid-19-update-first-ministers-speech-26-october/"
-speech_page <- read_html(url)
-speech_page
-```
-
-    ## {html_document}
-    ## <html dir="ltr" lang="en">
-    ## [1] <head>\n<meta http-equiv="Content-Type" content="text/html; charset=UTF-8 ...
-    ## [2] <body>\n    <input type="hidden" id="site-root-path" value="/"><!-- Googl ...
-
-``` r
-title <- speech_page %>%
-    html_node(".ds_page-header__title") %>%
-    html_text()
-
-speech_page %>%
-    html_node("#sg-meta__publication-date") %>%
-    html_text()
-```
-
-    ## [1] "26 October 2020"
-
-``` r
-date <- speech_page %>%
-    html_node("#sg-meta__publication-date") %>%
-    html_text() %>%
-    dmy()
-
-location <- speech_page %>%
-    html_node(".ds_metadata__item:nth-child(5) strong") %>%
-    html_text()
-
-abstract <- speech_page %>%
-    html_node(".ds_no-margin--bottom") %>%
-    html_text()
-
-text <- speech_page %>%
-    html_node(".publication-body") %>%
-    html_text()
-
-oct_26_speech <- tibble(
-  title    = title,
-  date     = date,
-  location = location,
-  abstract = abstract,
-  text     = text,
-  url      = url
-)
-oct_26_speech
-```
-
-    ## # A tibble: 1 × 6
-    ##   title                                 date       location abstract text  url  
-    ##   <chr>                                 <date>     <chr>    <chr>    <chr> <chr>
-    ## 1 Coronavirus (COVID-19) update: First… 2020-10-26 St Andr… Stateme… "\n … http…
-
 ## Exercises
+
+``` r
+# function: scrape_pac ---------------------------------------------------------
+
+scrape_pac <- function(url) {
+
+  # read the page
+  page <- read_html(url)
+
+  # extract the table
+  # select node .DataTable-Partial (identified using the HTML code)
+  pac <- page %>%
+    html_node(".DataTable-Partial") %>%
+    
+    # parse table at node td into a data frame
+    # table has a head and empty cells should be filled with NAs
+    html_table("td", header = TRUE, trim = TRUE) %>%
+    
+    # convert to a tibble
+    as_tibble()
+
+  # rename variables
+  pac <- pac %>%
+    
+    # rename columns (new name = old name)
+    rename(
+      name = `PAC Name (Affiliate)` ,
+      country_parent = `Country of Origin/Parent Company`,
+      total = `Total`,
+      dems = `Dems`,
+      repubs = `Repubs` 
+    )
+
+  # add year
+  pac <- pac %>%
+    
+    # extract last 4 characters of the URL and save as year
+    mutate(year = substr(url, nchar(url) - 3, nchar(url)))
+
+  # return data frame
+  pac
+
+}
+
+# test function ----------------------------------------------------------------
+
+url_2022 <- "https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2022"
+pac_2022 <- scrape_pac(url_2022)
+```
+
+    ## Warning: The `fill` argument of `html_table()` is deprecated as of rvest 1.0.0.
+    ## ℹ An improved algorithm fills by default so it is no longer needed.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+``` r
+url_2020 <- "https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2020"
+pac_2020 <- scrape_pac(url_2020)
+
+url_2018 <- "https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/2018"
+pac_2018 <- scrape_pac(url_2018)
+
+# list of urls -----------------------------------------------------------------
+
+# first part of url
+root <- "https://www.opensecrets.org/political-action-committees-pacs/foreign-connected-pacs/"
+
+# second part of url (election years as a sequence)
+year <- seq(from = 2000, to = 2024, by = 2)
+
+# construct urls by pasting first and second parts together
+urls <- paste0(root, year)
+
+# map the scrape_pac function over list of urls --------------------------------
+
+pac_all <- map_dfr(urls, scrape_pac)
+
+# write data -------------------------------------------------------------------
+
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+write_csv(pac_all, file = "../data/pac-all.csv")
+```
 
 ### Exercise 1
 
