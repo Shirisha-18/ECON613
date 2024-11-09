@@ -1,7 +1,7 @@
 Midterm 02
 ================
 Shirisha Biyyala
-2024-11-08
+2024-11-09
 
 ## Load packages and data
 
@@ -106,7 +106,7 @@ setwd("C:/Users/shiri/OneDrive/Documents/RStudio/exam-02")
 write_csv(pac_all, file = "pac-all.csv")
 ```
 
-#### References:
+#### References
 
 1.  <https://www.geeksforgeeks.org/extract-first-or-last-n-characters-from-string-in-r/>
 
@@ -153,6 +153,8 @@ n_obs_vars
 
     ## The dataset has 2638 observations and 6 variables.
 
+The dataset has **2638** observations and **6** variables.
+
 ## Data Cleaning
 
 ### Exercise 2
@@ -182,6 +184,13 @@ head(pac_all, 10)
     ##  8 AEGON USA (AEGON NV)          Nether… Aegon NV       $58,… $10,… $47,7…  2000
     ##  9 AIM Management Group          UK      AMVESCAP       $25,… $10,… $15,0…  2000
     ## 10 Air Liquide America           France  L'Air Liquide… $0    $0    $0      2000
+
+In this code chunk, we use the `separate_wider_delim()` function to
+split the `country_parent` column in the `pac_all` dataset into two new
+columns: `country` and `parent_company`, using “/” as the delimiter. If
+there are more than two parts after splitting, the extra components are
+merged into the `parent_company` column. Finally, we print the first 10
+rows of the modified dataset to verify the changes.
 
 ### Exercise 3
 
@@ -221,6 +230,15 @@ head(pac_all, 10)
     ##  9 AIM Management Group          UK      AMVESCAP       25000 10000  15000  2000
     ## 10 Air Liquide America           France  L'Air Liquide…     0     0      0  2000
 
+In this code, the `total`, `dems`, and `repubs` columns contained
+monetary values formatted as strings with dollar signs (`$`) and commas
+(`,`), which made it difficult to perform calculations. To clean the
+data, we used the `str_remove_all()` function to remove all dollar signs
+and commas from each of these columns. After cleaning, we converted the
+resulting strings into numeric values using `as.numeric()`. The data is
+now in a format suitable for analysis, and we printed the top 10 rows to
+confirm that the changes were applied correctly.
+
 #### References:
 
 1.  <https://www.geeksforgeeks.org/remove-all-special-characters-from-string-in-r/>
@@ -239,7 +257,7 @@ can_vs_mexico <- pac_all %>%
 ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
   geom_line(size = 1) +                   # Line plot with line width = 1
   labs(
-    title = "Total Contributions from Foreign-connected PACs in Canada and Mexico",
+    title = "Total Contributions from Foreign-connected PACs",
     subtitle = "Comparison of Contributions in Canada and Mexico Over the Years",
     x = "Year",
     y = "Total Contributions ($)",
@@ -251,35 +269,45 @@ ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
 
 ![](exam-02-shirisha-biyyala_files/figure-gfm/line-plot-1.png)<!-- -->
 
-#### Interpretation:
+#### Interpretation
+
+The plot reveals a positive correlation between contributions and years
+from 2000 to 2015 for both Canada and Mexico. However, after 2015, the
+trajectories of the two countries diverge. Canada experienced a
+significant and sustained increase in contributions, suggesting a surge
+in PAC activity. In contrast, Mexico saw a further decline, indicating a
+weakening of foreign-connected PAC influence.
+
+This graph underscores the distinct patterns of political contributions
+in Canada and Mexico, reflecting how foreign-linked PACs have shaped
+political financing in each country. It provides a clear comparison of
+the evolving trends, with Canada’s continued growth in contributions
+post-2015 and Mexico’s decline. The differing trends highlight the
+shifting political dynamics and the varying role of foreign-connected
+PACs in these two countries.
 
 ### Exercise 5
 
 ``` r
 # Step 1: Filter for UK contributions
 pac_all_uk <- pac_all %>%
-  filter(country == "United Kingdom")
+  filter(country == "UK", year <= 2020)
 
-# Step 2: Reshape data to long format
+# Step 2: Reshape data from wide to long format (pivot longer)
 pac_all_uk_long <- pac_all_uk %>%
   pivot_longer(cols = c(dems, repubs), 
                names_to = "party", 
                values_to = "amount")
 
-# Step 3: Group by year and party, then summarize the total contributions
+# Step 3: Group by year and party, then summarize total contributions
 pac_all_uk_summary <- pac_all_uk_long %>%
   group_by(year, party) %>%
-  summarize(total_contributions = sum(amount, na.rm = TRUE), .groups = "drop")
+  summarize(total_contributions = sum(amount, na.rm = TRUE)) %>%
+  ungroup()
 
-# Step 4: Define color mapping
-color_mapping <- c(
-  dems = "blue",  # Blue for Democrat
-  repubs = "red"  # Red for Republican
-)
-
-# Step 5: Create the plot
+# Step 4: Plot the data
 ggplot(pac_all_uk_summary, aes(x = year, y = total_contributions, color = party, group = party)) +
-  geom_line(size = 1) +  # Line plot for contributions
+  geom_line(size = 1.5) +  # Line plot for contributions
   scale_y_continuous(labels = label_dollar(scale = 1e-6, suffix = "M")) +  # Format y-axis labels in millions
   labs(
     title = "Contribution to US politics from UK-Connected PACs",
@@ -288,12 +316,29 @@ ggplot(pac_all_uk_summary, aes(x = year, y = total_contributions, color = party,
     y = "Amount",
     color = "Party"
   ) +
-  scale_color_manual(values = color_mapping) +  # Use the color_mapping
+  scale_color_manual(values = c("dems" = "blue", "repubs" = "red"), 
+                     labels = c("Democrat", "Republican")) +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "right")
 ```
 
-    ## Warning: No shared levels found between `names(values)` of the manual scale and the
-    ## data's colour values.
-
 ![](exam-02-shirisha-biyyala_files/figure-gfm/us-uk-comparison-visual-1.png)<!-- -->
+
+#### Interpretation
+
+### Interpretation:
+
+The graph compares contributions to US politics from **UK-connected
+PACs** for both **Democratic** and **Republican** parties over time.
+Contributions from the **Democratic party** were generally low but
+**peaked in 2010**, while contributions from the **Republican party**
+declined. This trend could reflect broader political dynamics in the US,
+such as the aftermath of the **2008 financial crisis** and the shifting
+political landscape.
+
+The spike in **Democratic contributions in 2010** may be attributed to
+significant political events like the **Affordable Care Act** push
+during President Obama’s term, while the decline in **Republican
+contributions** could point to a period of internal challenges within
+the party, including the rise of the **Tea Party movement** and the
+shifting political priorities of the time.

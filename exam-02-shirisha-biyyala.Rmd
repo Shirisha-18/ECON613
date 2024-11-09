@@ -125,6 +125,8 @@ n_obs_vars <- str_glue("The dataset has {nrow(pac_all)} observations and {ncol(p
 n_obs_vars
 ```
 
+The dataset has **2638** observations and **6** variables.
+
 ## Data Cleaning
 
 ### Exercise 2
@@ -140,6 +142,7 @@ pac_all <- pac_all %>%
 # Print the top 10 rows to check the result
 head(pac_all, 10)
 ```
+In this code chunk, we use the `separate_wider_delim()` function to split the `country_parent` column in the `pac_all` dataset into two new columns: `country` and `parent_company`, using "/" as the delimiter. If there are more than two parts after splitting, the extra components are merged into the `parent_company` column. Finally, we print the first 10 rows of the modified dataset to verify the changes.
 
 
 ### Exercise 3
@@ -166,13 +169,15 @@ pac_all <- pac_all %>%
 head(pac_all, 10)
 ```
 
+In this code, the `total`, `dems`, and `repubs` columns contained monetary values formatted as strings with dollar signs (`$`) and commas (`,`), which made it difficult to perform calculations. To clean the data, we used the `str_remove_all()` function to remove all dollar signs and commas from each of these columns. After cleaning, we converted the resulting strings into numeric values using `as.numeric()`. The data is now in a format suitable for analysis, and we printed the top 10 rows to confirm that the changes were applied correctly.
+
+
 #### References:
 
 1. https://www.geeksforgeeks.org/remove-all-special-characters-from-string-in-r/
 2. https://stackoverflow.com/questions/10294284/remove-all-special-characters-from-a-string-in-r
 
 ### Exercise 4
-
 
 ```{r line-plot, message = FALSE, warning= FALSE}
 # Filter data for Canada and Mexico, group by year and country
@@ -196,6 +201,10 @@ ggplot(can_vs_mexico, aes(x = year, y = total_contributions, color = country)) +
 ```
 
 #### Interpretation
+
+The plot reveals a positive correlation between contributions and years from 2000 to 2015 for both Canada and Mexico. However, after 2015, the trajectories of the two countries diverge. Canada experienced a significant and sustained increase in contributions, suggesting a surge in PAC activity. In contrast, Mexico saw a further decline, indicating a weakening of foreign-connected PAC influence.
+
+This graph underscores the distinct patterns of political contributions in Canada and Mexico, reflecting how foreign-linked PACs have shaped political financing in each country. It provides a clear comparison of the evolving trends, with Canada's continued growth in contributions post-2015 and Mexico's decline. The differing trends highlight the shifting political dynamics and the varying role of foreign-connected PACs in these two countries.
 
 
 ### Exercise 5
@@ -236,3 +245,10 @@ ggplot(pac_all_uk_summary, aes(x = year, y = total_contributions, color = party,
 ```
 
 #### Interpretation
+
+### Interpretation:
+
+The graph compares contributions to US politics from **UK-connected PACs** for both **Democratic** and **Republican** parties over time. Contributions from the **Democratic party** were generally low but **peaked in 2010**, while contributions from the **Republican party** declined. This trend could reflect broader political dynamics in the US, such as the aftermath of the **2008 financial crisis** and the shifting political landscape.
+
+The spike in **Democratic contributions in 2010** may be attributed to significant political events like the **Affordable Care Act** push during President Obama's term, while the decline in **Republican contributions** could point to a period of internal challenges within the party, including the rise of the **Tea Party movement** and the shifting political priorities of the time.
+
