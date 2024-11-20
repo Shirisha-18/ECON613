@@ -9,3 +9,87 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Load packages and data
+
+```{r load-packages, message = FALSE}
+library(tidytext)
+library(tidyverse)
+library(ggwordcloud)
+library(sotu)
+library(textstem)
+```
+
+
+```{r view-data}
+view(sotu_meta)
+glimpse(sotu_meta)
+
+view(sotu_text)
+glimpse(sotu_text)
+```
+
+## Exercises
+
+### Merge Datasets
+
+```{r merge-datasets}
+# Convert sotu_text to a dataframe
+sotu_text_df <- tibble(speech = sotu_text)
+
+# Merge the sotu_meta and sotu_text_df
+sotu <- sotu_meta %>%
+  add_column(speech = sotu_text_df$speech) %>%
+  as_tibble() %>%
+  rename(doc_id = X)
+
+# Check the tibble
+glimpse(sotu)
+```
+
+```{r preliminary-tasks}
+head(sotu)
+view(sotu)
+```
+
+## Exploratory Data Analysis
+
+### Obama’s Speeches: Text Analysis
+
+
+```{r filter-tokenize}
+obama_n <- sotu %>%
+  filter(president == "Barack Obama") %>%
+  unnest_tokens(word, speech, to_lower = FALSE, strip_punct = FALSE) %>%
+  count(word, sort = TRUE)
+
+head(obama_n)
+```
+
+
+```{r stop-words-removed}
+obama_n_cleaned <- obama_n %>%
+  anti_join(stop_words, by = "word") %>%
+  filter(n >= 10, nchar(word) >= 2) %>%
+  slice_max(n, n = 200)
+
+head(obama_n)
+```
+
+#### Word Cloud for Obama’s Speeches
+
+```{r plot-word-cloud}
+ggplot(obama_n_cleaned) +
+  geom_text_wordcloud(aes(label = word, size = n, color = n), rm_outside = TRUE) +
+  scale_size_area(max_size = 8) +
+  theme_void() +
+  labs(title = "Word Cloud of Obama's SOTU Speeches")
+
+
+```
+
+
+
+
+
+
+
