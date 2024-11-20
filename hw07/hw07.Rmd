@@ -87,9 +87,37 @@ ggplot(obama_n_cleaned) +
 
 ```
 
+## From Obama to everyone
 
+```{r tokenize-corpus}
+sotu_corpus <- sotu %>%
+  unnest_tokens(word, speech) %>%
+  count(word, sort = TRUE)
 
+head(sotu_corpus)
+```
 
+```{r most-common-words}
+top_words <- sotu_corpus %>%
+  anti_join(stop_words, by = "word") %>%
+  slice_max(n, n = 10)
+print(top_words)
 
+```
+
+```{r lemmatization}
+sotu_corpus <- sotu_corpus %>%
+  mutate(lemmata = lemmatize_words(word))
+
+head(sotu_corpus)
+```
+
+```{r top-100-frequent-words}
+sotu_top_words <- sotu_corpus %>%
+  count(lemmata, sort = TRUE) %>%
+  slice_max(n, n = 100)
+
+sotu_top_words
+```
 
 
