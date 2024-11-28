@@ -1,11 +1,97 @@
 ---
-title: "hw08"
+title: "hw08 - Maps"
 author: "Shirisha Biyyala"
 date: "2024-11-27"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+## Load packages
+
+```{r load-packages, message = FALSE, warning = FALSE}
+library(tidycensus)
+library(dplyr)
+library(tigris)
+library(ggplot2)
+library(sf)
+```
+
+
+## Set up and verify API Key 
+
+```{r api-key}
+# census_api_key("YOUR_API_KEY_removed", install = TRUE)
+
+test_data <- get_acs(geography = "state", variables = "B01003_001", year = 2022)
+head(test_data)
+```
+
+API key has been setup and the data preview indicates that the API is working correctly.
+
+## Load variables 
+
+```{r code-variables}
+# Load the list of variables 
+variables <- load_variables(year = 2022, dataset = "acs1")
+
+# Preview the variables
+head(variables)
+```
+
+### Part 1: State-Level Data and Mapping
+
+#### Step 1: Load State-Level Data
+
+```{r download-data}
+# Download state-level population data
+state_data <- get_acs(geography = "state", variables = "B01003_001", year = 2022, survey = "acs1")
+
+# Preview the data
+head(state_data)
+```
+
+#### Step 2: Download US State Shapefiles
+
+```{r shape-files}
+# Download state shapefiles
+state_shapes <- states(cb = TRUE)
+```
+
+#### Step 3: Merge Data Using State Names
+
+```{r merge-data}
+# Convert state names to lowercase for consistency
+state_data <- state_data %>%
+  mutate(NAME = tolower(NAME))
+state_shapes <- state_shapes %>%
+  mutate(NAME = tolower(NAME))
+
+# Merge the data using state names
+state_map_data <- left_join(state_shapes, state_data, by = "NAME")
+
+# Check the merged data
+head(state_map_data)
+```
+
+#### Step 4: Plot the US Map
+
+##### Step 4.1: Your first map
+
+```{r basic-map}
+# Create the map
+state_map_data %>%
+  ggplot(aes(fill = estimate)) +
+    geom_sf()  +
+    coord_sf(crs = st_crs(5070))  +
+    labs(title = "Population by State (2022)", fill = "Population") +
+    theme_minimal()
+```
+
+##### Step 4.2: Wait a sec!
+
+
+
 
