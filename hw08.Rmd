@@ -78,6 +78,10 @@ head(state_map_data)
 
 #### Step 4: Plot the US Map
 
+```{r explore-data}
+glimpse(state_map_data)
+```
+
 ##### Step 4.1: Your first map
 
 ```{r basic-map}
@@ -90,8 +94,46 @@ state_map_data %>%
     theme_minimal()
 ```
 
-##### Step 4.2: Wait a sec!
+##### Step 4.2: Filter Data by Geographical Bounds
 
+```{r contiguous_boundaries}
+# Filter for contiguous states using latitude and longitude bounds
+states_clean <- state_map_data %>%
+  filter(!NAME %in% c("alaska", "american samoa", "hawaii", "guam", "puerto rico", 
+                      "commonwealth of the northern mariana islands", 
+                      "united states virgin islands"))
+```
 
+##### Step 4.3: Change projection
+
+```{r change-projection}
+# Change projection to Albers Equal Area
+state_map <- ggplot(states_clean) +
+  geom_sf(aes(fill = estimate)) +
+  coord_sf(crs = st_crs(5070)) +
+  labs(title = "Population by Contiguous U.S. States (2022)", fill = "Population") +
+  theme_minimal()
+
+state_map
+```
+
+##### Step 4.4: Remove axes and grid
+
+```{r clean-visual}
+# Final map without axes and gridlines
+ggplot(states_clean) +
+  geom_sf(aes(fill = estimate)) +
+  labs(title = "Population by State (2022)", fill = "Population") +
+  coord_sf(crs = st_crs(5070)) +  # Apply projection
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
+### Part 2: County-Level Data and Mapping for a Specific State
 
 
