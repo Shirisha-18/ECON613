@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Load packages
 
-```{r load-packages, message = FALSE, warning = FALSE}
+```{r load-packages, echo=TRUE, message = FALSE, warning = FALSE}
 library(tidycensus)
 library(dplyr)
 library(tigris)
@@ -135,5 +135,77 @@ ggplot(states_clean) +
 ```
 
 ### Part 2: County-Level Data and Mapping for a Specific State
+
+#### Step 1: Load County-Level Data
+
+```{r county-data}
+# Create the map
+# Download county-level population data for California
+county_data <- get_acs(geography = "county", variables = "B01003_001", state = "CA", year = 2022)
+
+# Preview the data
+head(county_data)
+```
+
+#### Step 2: Download County Shapefiles
+
+```{r cal-county-shape}
+# Download county shape files for California
+county_shapes <- counties(state = "CA", cb = TRUE)
+head(county_shapes)
+```
+
+```{r check-names}
+# Check the names in both datasets
+head(county_data$NAME)
+head(county_shapes$NAME)
+```
+
+```{r clean-county-shape}
+# Clean the 'NAME' column in county_shapes by removing ' County, California' and convert to lowercase
+county_shapes$NAME <- tolower(gsub(" County, California", "", county_shapes$NAME))
+
+# Check if cleaning has worked
+head(county_shapes$NAME)
+```
+```{r clean-county-data}
+# Clean the 'NAME' column in county_data by removing ' county, california' and convert to lowercase
+county_data$NAME <- tolower(gsub(" county, california", "", county_data$NAME))
+
+# Check if cleaning has worked
+head(county_data$NAME)
+```
+
+
+
+#### Step 3: Merge Data Using County Names
+
+```{r merge-county-data}
+# Merge the data by county name
+county_map_data <- left_join(county_shapes, county_data, by = "NAME")
+
+# Check the merged data
+head(county_map_data)
+```
+
+#### Step 4: Plot the County Map
+
+```{r county-map}
+# Create the map with county-level population data
+ggplot(county_map_data) +
+  geom_sf(aes(fill = estimate)) +
+  labs(title = "Population by County in California (2022)", fill = "Population") +
+  coord_sf(crs = st_crs(5070)) +  # Apply projection
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
+
+
 
 
