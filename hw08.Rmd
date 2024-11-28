@@ -168,9 +168,14 @@ county_shapes$NAME <- tolower(gsub(" County, California", "", county_shapes$NAME
 # Check if cleaning has worked
 head(county_shapes$NAME)
 ```
+
 ```{r clean-county-data}
-# Clean the 'NAME' column in county_data by removing ' county, california' and convert to lowercase
-county_data$NAME <- tolower(gsub(" county, california", "", county_data$NAME))
+# Clean the 'NAME' column in county_data by removing ' county, california'
+county_data$NAME <- gsub(" county, california", "", county_data$NAME, ignore.case = TRUE)
+
+# Convert to lowercase
+county_data$NAME <- tolower(county_data$NAME)
+
 
 # Check if cleaning has worked
 head(county_data$NAME)
