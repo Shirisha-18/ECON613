@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Linear Models and Fixed Effects in R
 
-
 ### Prerequisites
 
 ```{r load-packages, message = FALSE, warning = FALSE}
@@ -24,24 +23,171 @@ library(parsnip)
 
 ### Step 1: Explore the Data
 
+```{r data-exploration}
+# Load data
+data("gapminder")
 
+# View structure and summary
+glimpse(gapminder)
+summary(gapminder)
+```
 
 ### Step 2: Build a Basic Linear Model
 
+```{r fit-model}
+# Fit the linear model
+lm_model <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(lifeExp ~ gdpPercap, data = gapminder)
+
+# Print out tidy output
+tidy(lm_model)
+```
+
+#### Interpretation
+- **Association between GDP per capita and life expectancy:**  
+  The coefficient for `gdpPercap` is **0.0007649**, indicating that for every 1-unit increase in GDP per capita, life expectancy increases by a very small amount (less than a day).  
+
+- **Statistical significance:**  
+  The relationship is statistically significant, as indicated by the small standard error.  
+
+
 ### Step 3: Transform GDP Per Capita (Log Transformation)
+
+```{r log-transformation}
+# Add a log-transformed GDP column
+gapminder <- gapminder %>%
+  mutate(log_gdpPercap = log(gdpPercap))
+
+# Refit the model with log-transformed GDP
+lm_log_model <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(lifeExp ~ log_gdpPercap, data = gapminder)
+
+# Print out tidy output
+tidy(lm_log_model)
+```
+
+#### Interpretation
+- **Association between GDP per capita and life expectancy:**  
+  After log-transforming GDP, the coefficient for `log_gdpPercap` is **8.4051**, showing that a 1% increase in GDP per capita is associated with an increase of **8.4 years** in life expectancy.  
+
+- **Statistical significance:**  
+  The relationship remains statistically significant, as the standard error is small relative to the coefficient.  
+
+- **Change in the relationship compared to Step 2:**  
+  The transformation changes the scale of the relationship. The effect size appears larger when expressed as a percentage increase, showing the diminishing returns of GDP growth on life expectancy.  
 
 
 ### Step 4: Visualize the Model Fit
 
+```{r model-visualize}
+# Scatter plot with regression line
+gapminder %>%
+  ggplot(aes(x = log_gdpPercap, y = lifeExp)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", color = "blue") +
+  labs(title = "Relationship Between Log GDP per Capita and Life Expectancy",
+       x = "Log GDP per Capita",
+       y = "Life Expectancy")
+```
+
 
 ### Step 5: Add Fixed Effects for Continent
 
+```{r fixed-effects}
+# Fit the model with fixed effects
+lm_fe_model <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(lifeExp ~ log_gdpPercap + continent, data = gapminder)
+
+# Print out tidy output
+tidy(lm_fe_model)
+
+```
+
+#### Interpretation
+- **Association between GDP per capita and life expectancy:**  
+  The coefficient for `log_gdpPercap` is **6.4220**, suggesting that a 1% increase in GDP per capita corresponds to an increase of **6.4 years** in life expectancy, accounting for continent-specific factors.  
+
+- **Statistical significance:**  
+  The relationship is still statistically significant.  
+
+- **Change in the relationship compared to Step 3:**  
+  The magnitude of the coefficient decreased, indicating that some variation in life expectancy attributed to GDP per capita is explained by continent-level factors.  
 
 ### Step 6: Use felm for country and continent Fixed Effects
 
+```{r country-level-fixed}
+# Fit the fixed effects model
+felm_model <- felm(lifeExp ~ log_gdpPercap | country, data = gapminder)
 
+# View the summary
+tidy(felm_model)
+
+```
+
+#### Interpretation
+- **Association between log GDP per capita and life expectancy:**  
+  The coefficient for `log_gdpPercap` is **9.7690**, meaning a 1% increase in GDP per capita is associated with an increase of **9.8 years** in life expectancy after controlling for country-specific factors.  
+
+- **Statistical significance:**  
+  The relationship remains statistically significant, as indicated by the small standard error.  
+
+- **Change in the relationship compared to Step 5:**  
+  The coefficient increased compared to the continent fixed effects model, suggesting that variations within countries show a stronger relationship between GDP per capita and life expectancy. 
+  
+```{r global-trends}
+felm_model_year <- felm(lifeExp ~ log_gdpPercap | country + year, data = gapminder)
+tidy(felm_model_year)
+```
+
+- **Bonus:**  
+  Adding year fixed effects would control for global trends, such as advancements in healthcare and international economic conditions, that influence both GDP and life expectancy over time.  
+  
 ### Step 7: Compare Models
+
+```{r compare-models}
+# Tidy model outputs
+tidy_lm <- tidy(lm_model)
+tidy_lm_log <- tidy(lm_log_model)
+tidy_lm_fe <- tidy(lm_fe_model)
+tidy_felm <- tidy(felm_model)
+
+# Combine for comparison
+model_comparison <- bind_rows(
+  tidy_lm %>% mutate(model = "Basic LM"),
+  tidy_lm_log %>% mutate(model = "Log-transformed LM"),
+  tidy_lm_fe %>% mutate(model = "LM with Continent FE"),
+  tidy_felm %>% mutate(model = "FELM with Country FE")
+)
+
+# Filter for GDP term
+model_comparison %>%
+  filter(term == "log_gdpPercap" | term == "gdpPercap") %>%
+  select(model, term, estimate, std.error, p.value)
+```
+
+#### Interpretation
+- **Basic LM**: The initial linear model shows a very small positive association between GDP per capita and life expectancy.
+- **Log-transformed LM**: Log-transforming GDP highlights a stronger relationship, reflecting diminishing returns.
+- **LM with Continent FE**: Adding continent fixed effects adjusts for regional differences.
+- **FELM with Country FE**: Introducing country-level fixed effects strengthens the association.
+- **FELM with Country + Year FE**: Adding year fixed effects reduces the GDP coefficient, showing that time trends account for some variability.
 
 
 ### Step 8: Discuss and Interpret
+#### Fixed Effects Impact
+- Including fixed effects progressively refines the model:
+  1. Controlling for continents reduces variability due to regional factors.  
+  2. Country-specific effects isolate within-country trends.  
+  3. Adding year fixed effects captures global time-related influences.  
 
+#### Additional Factors to Improve the Model
+1. **Healthcare:** Number of hospitals or healthcare spending.  
+2. **Education:** Literacy rates or average schooling years.  
+3. **Policy Stability:** Governance indicators.  
+4. **Environmental Data:** Pollution and climate factors.  
+5. **Technological Progress:** Internet penetration or innovation indices.  
+
+Including these could enhance the explanatory power of the model and account for more variability in life expectancy.  
