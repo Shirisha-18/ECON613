@@ -1,0 +1,47 @@
+---
+title: "hw09"
+author: "Shirisha Biyyala"
+date: "2024-12-04"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Linear Models and Fixed Effects in R
+
+
+### Prerequisites
+
+```{r load-packages, message = FALSE, warning = FALSE}
+library(gapminder)
+library(tidyverse)
+library(broom)
+library(lfe)
+library(parsnip)
+```
+
+### Step 1: Explore the Data
+
+
+
+### Step 2: Build a Basic Linear Model
+
+### Step 3: Transform GDP Per Capita (Log Transformation)
+
+
+### Step 4: Visualize the Model Fit
+
+
+### Step 5: Add Fixed Effects for Continent
+
+
+### Step 6: Use felm for country and continent Fixed Effects
+
+
+### Step 7: Compare Models
+
+
+### Step 8: Discuss and Interpret
+
