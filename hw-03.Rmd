@@ -1,0 +1,111 @@
+---
+title: "HW 03 - Road traffic accidents"
+author: "Shirisha Biyyala"
+date: "2024-09-25"
+output: github_document
+---
+
+## Load packages and data
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+
+load("data/accidents.rda")
+```
+
+## Exercises
+
+### Exercise 1
+
+The dataset has `r nrow(accidents)` observations.
+
+### Exercise 2
+
+Each row in the dataset represents an individual accident or crash incident, with each column providing specific details about that event. These details typically include:
+
+- **ID**: Unique identifier for the accident.
+- **Easting/Northing**: Geographic coordinates for mapping.
+- **Severity**: Level of severity (e.g., slight, serious).
+- **Vehicles**: Number of vehicles involved.
+- **Casualties**: Number of injuries or fatalities.
+- **Date**: When the accident occurred.
+- etc
+
+It's a record of specific accident events with all relevant information.
+
+```{r}
+view(accidents)
+```
+
+```{r, echo=FALSE, results='asis'}
+# Get the head of the dataset
+accidents_head <- head(accidents)
+
+# Create an HTML table
+html_table <- knitr::kable(accidents_head, format = "html", escape = FALSE)
+
+# Print the scrollable table
+cat(paste0(
+  "<div style='overflow-x: auto; max-width: 100%; height: 300px;'>",
+  html_table,
+  "</div>"
+))
+```
+
+
+### Exercise 3
+
+#### Accident Density Plot by Time and Severity
+
+This plot shows the **density distribution of accidents throughout the day** based on the time they occurred, separated into **Weekdays and Weekends**. The fill represents the **severity of the accidents** (e.g., Slight, Serious, Fatal).
+
+- **Facets**: The data is divided into two facets: **Weekday** and **Weekend**, allowing for a comparison of accident patterns between these time frames.
+- **X-axis**: Displays the time of day when accidents happened.
+- **Y-axis**: Represents the density of accidents, showing the probability of accidents happening at different times.
+- **Fill Colors**: The different accident severities are indicated by the colors, based on the `viridis` color palette.
+
+By visualizing this, we can identify if certain times of the day (e.g., rush hours) are associated with higher accident severity and if weekends differ from weekdays in terms of accident distribution.
+
+```{r accidents_density_plot, fig.fullwidth = TRUE}
+accidents %>%
+  mutate(day_of_week_type = if_else(day_of_week %in% c("Saturday", "Sunday"), "Weekend", "Weekday")) %>%
+  ggplot(aes(x = time, fill = severity)) +  
+  geom_density(adjust = 1, alpha = 0.5) +
+  facet_grid(day_of_week_type ~ .) +
+  scale_fill_viridis_d() +
+  labs(title = "Number of accidents throughout the day",
+       subtitle = "By day of week and severity",
+       x = "Time of the Day",
+       y = "Density",
+       fill = "Severity") +
+    theme_minimal()
+```
+
+### Exercise 4
+
+#### Scatter Plot of Latitude vs. Longitude with Vehicles and Casualties
+
+The scatter plot visualizes the relationship between geographic coordinates (latitude and longitude) of accidents while simultaneously depicting the number of vehicles involved and the casualties reported. This multi-dimensional representation allows for a comprehensive understanding of how these factors interrelate in different locations.
+
+
+```{r scatter-plot-location-accidents, fig.fullwidth = TRUE}
+# Scatter plot of Latitude vs. Longitude
+ggplot(accidents, aes(x = longitude, y = latitude)) +
+  geom_point(aes(size = vehicles, color = casualties), alpha = 0.5) +
+  labs(title = "Scatter Plot of Latitude vs. Longitude",
+       x = "Longitude",
+       y = "Latitude",
+       size = "Number of Vehicles",
+       color = "Number of Casualties") +
+  scale_color_gradient(low = "blue", high = "red") + # Gradient color for casualties
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+#### Interpretation
+
+- **Geographic Patterns**: The plot allows for easy identification of accident hotspots—areas with a high density of accidents can be recognized by clusters of larger, red-colored points.
+
+- **Correlation Insights**: By analyzing the distribution of point sizes and colors, viewers can infer potential correlations between the number of vehicles involved and the resulting casualties. For instance, locations where larger accidents (more vehicles) are coupled with higher casualties may indicate more severe conditions, such as busy intersections or hazardous roadways.
+
+Overall, this scatter plot serves as an effective tool for visualizing the intersection of geographic data and accident statistics. By portraying the relationship between latitude, longitude, vehicle count, and casualties, it enables a better understanding of where and how severe accidents occur, facilitating data-driven decision-making for enhancing road safety.
