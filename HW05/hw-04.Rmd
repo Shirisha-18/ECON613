@@ -1,0 +1,299 @@
+---
+title: "HW 04 - What should I major in?"
+author: "Shirisha Biyyala"
+date: "2024-09-30"
+output: github_document
+---
+
+## Load packages and data
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+library(scales)
+library(fivethirtyeight)
+```
+
+```{r understand-data}
+glimpse(college_recent_grads)
+?college_recent_grads
+view(college_recent_grads)
+```
+
+```{r college_recent_grads_head, echo=FALSE, results='asis'}
+# Get the head of the dataset
+college_recent_grads_head <- head(college_recent_grads)
+
+# Create an HTML table
+html_table <- knitr::kable(college_recent_grads_head, format = "html", escape = FALSE)
+
+# Print the scrollable table
+cat(paste0(
+  "<div style='overflow-x: auto; max-width: 100%; height: 300px;'>",
+  html_table,
+  "</div>"
+))
+```
+
+## Exercises
+
+### Exercise 1
+
+In this code chunk, we will:
+
+- Arrange the data by the proportion of women (sharewomen) in descending order,highlighting majors with the highest proportion of women at the top.
+- Select only the relevant columns: `major`, `total` (the number of people with that major),and `sharewomen` (the proportion of women).
+- Display only the top 3 majors by using top_n(3).
+
+```{r top_n_major}
+college_recent_grads %>%
+  arrange(desc(sharewomen)) %>% 
+  select(major, total, sharewomen) %>%
+  top_n(3)
+```
+
+
+### Exercise 2
+
+In this code chunk, we will:
+
+- **Visualize Median Income Distribution:** Create a histogram to illustrate how median incomes are distributed among recent graduates by `major`.
+  
+- **Select Binwidth:** Use a binwidth of $1000 to capture meaningful variations in income without excessive detail.
+
+- **Analyze Distribution Characteristics:** Examine the histogram to identify patterns, skewness, and potential outliers in the income data.
+
+```{r histogram-visualization}
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram() +
+  theme_minimal()
+
+
+# Create histogram with a binwidth of $1000
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 1000, fill = "lightblue") +
+  labs(title = "Distribution of Median Incomes (Binwidth = $1000)",
+       x = "Median Income",
+       y = "Count") +
+  theme_minimal()
+
+# Create histogram with a binwidth of $5000
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 5000, fill = "rosybrown") +
+  labs(title = "Distribution of Median Incomes (Binwidth = $5000)",
+       x = "Median Income",
+       y = "Count") +
+  theme_minimal()
+```
+
+#### Interpretation
+Both histograms will illustrate the distribution of median incomes effectively, but the choice of binwidth impacts the level of detail visible. The $1,000 binwidth allows for a more granular analysis, which can help identify clusters of income levels, while the $5,000 binwidth provides a clearer overview of income distribution trends without getting bogged down in too much detail.
+
+
+### Exercise 3
+
+```{r summary-statistics}
+summary_stats <- college_recent_grads %>%
+  summarise(min = min(median), max = max(median),
+            mean = mean(median), med = median(median),
+            sd = sd(median), 
+            q1 = quantile(median, probs = 0.25),
+            q3 = quantile(median, probs = 0.75))
+
+summary_stats
+```
+
+#### Interpretation
+
+Given the income statistics, it is essential to highlight that the median income (36,000) is significantly lower than the mean (40,151.45), indicating a right-skewed distribution where a few graduates earn much higher incomes, pulling the average up. The quartiles (Q1 and Q3) further emphasize the spread, with the interquartile range (IQR) between $33,000 and $45,000, suggesting that the middle 50% of graduates earn within this range.
+
+This analysis helps in understanding how the distribution of median incomes varies across different categories and highlights the necessity of using both visual and statistical methods to capture the nuances of income data.
+
+
+### Exercise 4
+
+### Histogram Shape and Summary Statistics
+
+#### Shape
+The histograms reveal a **right-skewed** distribution of median incomes, indicating that most graduates earn lower to moderate incomes, while a few high earners significantly influence the overall average.
+
+#### Center
+- **Median**: $36,000, providing a reliable measure of typical income.
+- **Mean**: $40,151.45, higher than the median due to outliers.
+
+#### Spread
+- **Standard Deviation**: $11,470.18, indicating moderate variability in incomes.
+- **Interquartile Range (IQR)**: $12,000 (Q1: $33,000, Q3: $45,000), showing that the middle 50% of graduates earn within this range.
+
+#### Unusual Observations
+- **Outliers**: A maximum income of $110,000 highlights significant income disparity.
+- **Range**: Incomes range from $22,000 to $110,000.
+
+### Summary Statistics Output
+
+```{r summary-statistics-table}
+# Display summary statistics as a table
+knitr::kable(summary_stats, format = "html", caption = "Summary Statistics for Median Incomes")
+```
+
+
+#### Conclusion
+The median and IQR are the most useful statistics for understanding this right-skewed income distribution, revealing a typical income of $36,000 and a significant range in earnings among graduates.
+
+### Exercise 5
+
+### Faceted Histogram of Median Income
+
+In this code chunk, we will:
+
+- Plot the distribution of median income using a histogram, allowing us to visualize how median income varies across different major categories.
+- Use a binwidth of $5000, which was determined to be appropriate in the previous exercise.
+- Facet the histogram by `major_category`, providing a clear comparison of income distributions for each category.
+
+This visualization helps in understanding the disparities in median income among various fields of study, highlighting trends and differences effectively.
+
+```{r faceted-histogram}
+# Create faceted histogram of median income by major_category
+ggplot(data = college_recent_grads, mapping = aes(x = median)) +
+  geom_histogram(binwidth = 5000, fill = "lightblue") +
+  labs(title = "Distribution of Median Income by Major Category",
+       x = "Median Income",
+       y = "Count") +
+  facet_wrap(~ major_category) +
+  theme_minimal()
+```
+
+
+### Exercise 6
+
+To determine which major category has the highest typical median income, we can use the **median** statistic for each `major_category`.
+
+```{r highest-median-income}
+college_recent_grads %>%
+  group_by(major_category) %>%
+  summarise(median_income = median(median, na.rm = TRUE)) %>%
+  arrange(desc(median_income))
+```
+
+#### Interpretation
+
+1. **Top Earners:** Graduates in **Engineering** have the highest median income of **$57,000**, indicating strong market demand and earning potential in this field. This is significantly higher than all other categories.
+
+2. **Competitive Fields:** **Computers & Mathematics** also shows a strong median income of **$45,000**, reflecting the growing need for skills in technology and data analysis.
+
+3. **Moderate Income:** Majors like **Business**, **Physical Sciences**, and **Social Science** earn between **$38,000** and **$40,000**, suggesting decent opportunities but less lucrative than STEM fields.
+
+4. **Lower Earnings:** Fields such as **Psychology & Social Work** and **Arts** have the lowest median incomes, around **$30,000 to $32,750**, indicating more limited financial prospects in these areas.
+
+The data clearly indicates that majors in Engineering and Computer-related fields provide the highest earning potential, while those in the Arts and Social Work are at the lower end of the income spectrum. This information is valuable for prospective students when considering their educational and career paths.
+
+### Exercise 7
+
+```{r least-popular-major}
+college_recent_grads %>%
+  count(major_category) %>%
+  arrange(n)
+```
+
+#### Interpretation
+In summary, the data highlights that the Interdisciplinary major is the least popular among the surveyed students, which could be a point of interest for educational institutions looking to understand student preferences and improve program offerings.
+
+
+### Exercise 8
+
+```{r stem-major}
+# Define the STEM categories
+stem_categories <- c("Biology & Life Science",
+                     "Computers & Mathematics",
+                     "Engineering",
+                     "Physical Sciences")
+
+# Add a new column for major type
+college_recent_grads <- college_recent_grads %>%
+  mutate(major_type = ifelse(major_category %in% stem_categories, "stem", "not stem"))
+
+# Filter for STEM majors with median salaries < $36,000
+stem_low_income <- college_recent_grads %>%
+  filter(
+    major_type == "stem",
+    median < 36000
+  ) %>%
+  group_by(major_category) %>%  
+  summarise(
+    Median_Income = median(median),
+    P25th = median(p25th),  
+    P75th = median(p75th)   
+  ) %>%
+  arrange(desc(Median_Income))  
+
+# Rename the columns names
+colnames(stem_low_income) <- c("Major Category", "Median Income", "25th Percentile Income", "75th Percentile Income")
+
+# Display the results as a table
+knitr::kable(stem_low_income, format = "html", caption = "STEM Majors with Median Salaries < $36,000")
+
+```
+
+
+#### Interpretation
+The analysis reveals that all three STEM majors— `Computers & Mathematics`, `Physical Sciences`, and `Biology & Life Science` —have median incomes below $36,000.These findings highlight the financial challenges faced by graduates in these STEM fields, with many starting at low salaries, though there is potential for higher earnings for those who excel.
+
+
+### Exercise 9
+
+```{r scatterplot-median-income}
+# Scatterplot of median income vs. proportion of women
+ggplot(data = college_recent_grads, aes(x = sharewomen, y = median, color = major_type)) +
+  geom_point() +
+  labs(title = "Median Income vs. Proportion of Women by Major Type",
+       x = "Proportion of Women in Major",
+       y = "Median Income") +
+  scale_color_manual(values = c("stem" = "lightblue", "not stem" = "rosybrown"),
+                     name = "Major Type",
+                     labels = c("STEM", "Not STEM")) +
+  theme_minimal()
+```
+
+#### Interpretation
+
+The scatter plot reveals a trend where:
+
+- **STEM fields** have higher representation of women but lower income potential, indicating possible barriers to income growth despite participation.
+- **Non-STEM fields** show a lower representation of women but higher average incomes, suggesting these areas may provide more immediate financial benefits.
+
+This contrast highlights important considerations regarding the economic outcomes associated with different major types for women and could inform strategies to enhance women's earning potential in STEM fields.
+
+
+### Exercise 10
+
+**How does the representation of women in different major types relate to their median incomes?**
+
+```{r major-type-median-graph}
+# Create the bar plot
+ggplot(data = college_recent_grads, aes(x = major_type, y = median)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Women's Representation and Median Income by Major Type",
+       x = "Major Type",
+       y = "Value") +
+  theme_minimal() +
+  scale_y_continuous(labels = scales::dollar_format(scale = 1, prefix = "$"))
+```
+
+
+```{r major-type-summary-stats}
+# Assuming college_recent_grads is your dataset
+summary_stats <- college_recent_grads %>%
+  group_by(major_type) %>%
+  summarise(
+    Count = n(),  # Number of observations
+    Mean_Income = mean(median, na.rm = TRUE),  # Mean income
+    Median_Income = median(median, na.rm = TRUE),  # Median income
+    SD_Income = sd(Median_Income, na.rm = TRUE)  # Standard deviation of income
+  )
+
+# Print summary statistics
+print(summary_stats)
+```
+
+#### Interpretation
+
+Women are more represented in non-STEM majors (109 graduates) compared to STEM majors (64 graduates). However, those in STEM fields earn significantly higher, with a mean income of approximately $47,861 and a median income of $45,000, compared to $35,625 mean and $34,000 median incomes for non-STEM graduates. This indicates that pursuing STEM majors may lead to better financial outcomes for women.
