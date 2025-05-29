@@ -1,0 +1,77 @@
+---
+title: "HW 01 - Pet names"
+author: "Shirisha Biyyala"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+## Load packages and data
+
+```{r load-packages, message = FALSE}
+library(tidyverse)
+library(openintro)
+
+```
+
+## Exercises
+
+### Exercise 1
+
+The data dictionary indicates that the dataset contains 52,519 pets.
+
+```{r count_rows}
+total_rows <- nrow(seattlepets)
+total_rows
+```
+
+
+### Exercise 2
+
+According to the data dictionary, each pet is described by 7 variables.
+
+```{r count_cols}
+total_cols <- ncol(seattlepets)
+total_cols
+```
+
+
+### Exercise 3
+
+The three most popular pet names are Lucy, with a frequency of 439; Charlie, with 387; and Luna, with 355. Additionally, there are 483 pet names listed as unknown, represented as NA.
+
+```{r most-common-names}
+seattlepets %>%
+  count(animal_name, sort = TRUE)
+```
+
+###     Exercise 4
+
+By updating the code, we identified the most common pet names for each species. We used slice_head() to find the top names based on their frequency.
+
+Results:
+
+1. Cats: The top names are Lucy (111 occurrences), Luna (102), Lily (86), and Max (83).
+2. Dogs: The most common names are Lucy (337), Charlie (306), Bella (249), Luna (244), and Daisy (221).
+3. Goats: The name Heidi (2 occurrences) is the most common, showing generally low frequencies for goat names.
+4. Pigs: Each pig name appears only once, so all names are listed with the same frequency.
+
+```{r most-common-cat-dog-names}
+seattlepets %>%
+group_by(species) %>%
+count(animal_name, sort = TRUE) %>%
+slice_head(n = 5)
+```
+
+### Exercise 5
+
+Points above the y = x line indicate that the proportion of the name being a cat is higher than the proportion of it being a dog. Points below the y = x line indicate that the proportion of the name being a dog is higher than the proportion of it being a cat.
+
+<b>So, names that are more common for cats than dogs are represented by points above the y = x line.</b>
+
+Some of them are: Lucy, Luna, Bella, Charlie etc.
+
+### Exercise 6
+
+The fact that most of the common names are above the y = x line and to the left means that these names are more often used for cats than for dogs. This shows a negative relationship between the two variables: as the proportion of cats with a name increases, the proportion of dogs with that name decreases. In simple terms, the names that are popular for cats are generally not as common for dogs.
+
+For example, a name like "Daisy" is very popular among cats but rarely used for dogs.
