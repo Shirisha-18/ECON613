@@ -1,0 +1,216 @@
+---
+title: "hw08 - Maps"
+author: "Shirisha Biyyala"
+date: "2024-11-27"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages
+
+```{r load-packages, echo=TRUE, message = FALSE, warning = FALSE}
+library(tidycensus)
+library(dplyr)
+library(tigris)
+library(ggplot2)
+library(sf)
+```
+
+
+## Set up and verify API Key 
+
+```{r api-key}
+# census_api_key("YOUR_API_KEY_removed", install = TRUE)
+
+test_data <- get_acs(geography = "state", variables = "B01003_001", year = 2022)
+head(test_data)
+```
+
+API key has been setup and the data preview indicates that the API is working correctly.
+
+## Load variables 
+
+```{r code-variables}
+# Load the list of variables 
+variables <- load_variables(year = 2022, dataset = "acs1")
+
+# Preview the variables
+head(variables)
+```
+
+### Part 1: State-Level Data and Mapping
+
+#### Step 1: Load State-Level Data
+
+```{r download-data}
+# Download state-level population data
+state_data <- get_acs(geography = "state", variables = "B01003_001", year = 2022, survey = "acs1")
+
+# Preview the data
+head(state_data)
+```
+
+#### Step 2: Download US State Shapefiles
+
+```{r shape-files}
+# Download state shapefiles
+state_shapes <- states(cb = TRUE)
+```
+
+#### Step 3: Merge Data Using State Names
+
+```{r merge-data}
+# Convert state names to lowercase for consistency
+state_data <- state_data %>%
+  mutate(NAME = tolower(NAME))
+state_shapes <- state_shapes %>%
+  mutate(NAME = tolower(NAME))
+
+# Merge the data using state names
+state_map_data <- left_join(state_shapes, state_data, by = "NAME")
+
+# Check the merged data
+head(state_map_data)
+```
+
+#### Step 4: Plot the US Map
+
+```{r explore-data}
+glimpse(state_map_data)
+```
+
+##### Step 4.1: Your first map
+
+```{r basic-map}
+# Create the map
+state_map_data %>%
+  ggplot(aes(fill = estimate)) +
+    geom_sf()  +
+    coord_sf(crs = st_crs(5070))  +
+    labs(title = "Population by State (2022)", fill = "Population") +
+    theme_minimal()
+```
+
+##### Step 4.2: Filter Data by Geographical Bounds
+
+```{r contiguous_boundaries}
+# Filter for contiguous states using latitude and longitude bounds
+states_clean <- state_map_data %>%
+  filter(!NAME %in% c("alaska", "american samoa", "hawaii", "guam", "puerto rico", 
+                      "commonwealth of the northern mariana islands", 
+                      "united states virgin islands"))
+```
+
+##### Step 4.3: Change projection
+
+```{r change-projection}
+# Change projection to Albers Equal Area
+state_map <- ggplot(states_clean) +
+  geom_sf(aes(fill = estimate)) +
+  coord_sf(crs = st_crs(5070)) +
+  labs(title = "Population by Contiguous U.S. States (2022)", fill = "Population") +
+  theme_minimal()
+
+state_map
+```
+
+##### Step 4.4: Remove axes and grid
+
+```{r clean-visual}
+# Final map without axes and gridlines
+ggplot(states_clean) +
+  geom_sf(aes(fill = estimate)) +
+  labs(title = "Population by State (2022)", fill = "Population") +
+  coord_sf(crs = st_crs(5070)) +  # Apply projection
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
+### Part 2: County-Level Data and Mapping for a Specific State
+
+#### Step 1: Load County-Level Data
+
+```{r county-data}
+# Create the map
+# Download county-level population data for California
+county_data <- get_acs(geography = "county", variables = "B01003_001", state = "CA", year = 2022)
+
+# Preview the data
+head(county_data)
+```
+
+#### Step 2: Download County Shapefiles
+
+```{r cal-county-shape}
+# Download county shape files for California
+county_shapes <- counties(state = "CA", cb = TRUE)
+head(county_shapes)
+```
+
+```{r check-names}
+# Check the names in both datasets
+head(county_data$NAME)
+head(county_shapes$NAME)
+```
+
+```{r clean-county-shape}
+# Clean the 'NAME' column in county_shapes by removing ' County, California' and convert to lowercase
+county_shapes$NAME <- tolower(gsub(" County, California", "", county_shapes$NAME))
+
+# Check if cleaning has worked
+head(county_shapes$NAME)
+```
+
+```{r clean-county-data}
+# Clean the 'NAME' column in county_data by removing ' county, california'
+county_data$NAME <- gsub(" county, california", "", county_data$NAME, ignore.case = TRUE)
+
+# Convert to lowercase
+county_data$NAME <- tolower(county_data$NAME)
+
+
+# Check if cleaning has worked
+head(county_data$NAME)
+```
+
+
+
+#### Step 3: Merge Data Using County Names
+
+```{r merge-county-data}
+# Merge the data by county name
+county_map_data <- left_join(county_shapes, county_data, by = "NAME")
+
+# Check the merged data
+head(county_map_data)
+```
+
+#### Step 4: Plot the County Map
+
+```{r county-map}
+# Create the map with county-level population data
+ggplot(county_map_data) +
+  geom_sf(aes(fill = estimate)) +
+  labs(title = "Population by County in California (2022)", fill = "Population") +
+  coord_sf(crs = st_crs(5070)) +  # Apply projection
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
+
+
+
+
