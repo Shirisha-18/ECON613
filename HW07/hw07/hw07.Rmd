@@ -1,0 +1,195 @@
+---
+title: "HW 07 - SOTU"
+author: "Shirisha Biyyala"
+date: " `r Sys.Date()` "
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load packages and data
+
+```{r load-packages, message = FALSE, warning= FALSE}
+library(tidytext)
+library(tidyverse)
+library(ggwordcloud)
+library(sotu)
+library(textstem)
+library(dplyr)
+```
+
+
+```{r view-data}
+view(sotu_meta)
+glimpse(sotu_meta)
+
+view(sotu_text)
+glimpse(sotu_text)
+```
+
+## Exercises
+
+### Merge Datasets
+
+```{r merge-datasets}
+# Convert sotu_text to a dataframe
+sotu_text_df <- tibble(speech = sotu_text)
+
+# Merge the sotu_meta and sotu_text_df
+sotu <- sotu_meta %>%
+  add_column(speech = sotu_text_df$speech) %>%
+  as_tibble() %>%
+  rename(doc_id = X)
+
+# Check the tibble
+glimpse(sotu)
+```
+
+```{r preliminary-tasks}
+head(sotu)
+view(sotu)
+```
+
+## Exploratory Data Analysis
+
+### Obama’s Speeches: Text Analysis
+
+
+```{r filter-tokenize}
+obama_n <- sotu %>%
+  filter(president == "Barack Obama") %>%
+  unnest_tokens(word, speech, to_lower = FALSE, strip_punct = FALSE) %>%
+  count(word, sort = TRUE)
+```
+
+
+```{r stop-words-removed}
+obama_n_cleaned <- obama_n %>%
+  anti_join(stop_words, by = "word") %>%
+  filter(n >= 10, nchar(word) >= 2) %>%
+  slice_max(n, n = 200)
+head(obama_n)
+```
+
+#### Word Cloud for Obama’s Speeches
+
+```{r plot-word-cloud}
+ggplot(obama_n_cleaned) +
+  geom_text_wordcloud(aes(label = word, size = n, color = n), rm_outside = TRUE) +
+  scale_size_area(max_size = 8) +
+  theme_void() +
+  labs(title = "Word Cloud of Obama's SOTU Speeches")
+```
+
+## From Obama to everyone
+
+```{r tokenize-corpus}
+sotu_corpus <- sotu %>%
+  unnest_tokens(word, speech) %>%
+  count(word, sort = TRUE)
+
+head(sotu_corpus, 10)
+```
+
+```{r most-common-words}
+# Remove stop words
+sotu_corpus <- sotu_corpus %>%
+  anti_join(stop_words, by = "word")
+
+# Top 10 most frequent words
+top_words <- sotu_corpus %>%
+  slice_max(n, n = 10)
+
+# Print the result
+print(top_words)
+```
+
+```{r lemmatization}
+sotu_corpus <- sotu_corpus %>%
+  mutate(lemmata = lemmatize_words(word))
+
+sotu_corpus
+```
+
+```{r top-100-frequent-words}
+sotu_top_words <- sotu_corpus %>%
+  count(lemmata, sort = TRUE) %>%
+  slice_head(n = 100)
+
+sotu_top_words
+```
+
+## Analyzing and visualizing texts
+
+```{r word-cloud}
+ggplot(sotu_top_words) +
+  geom_text_wordcloud(aes(label = lemmata, size = n, color = n), rm_outside = TRUE) +
+  scale_size_area(max_size = 8) +
+  theme_void() +
+  labs(title = "Word Cloud of All SOTU Speeches")
+```
+
+```{r bar-plot-top-words}
+sotu_top_25 <- sotu_top_words %>%
+  slice_head(n = 25)
+
+ggplot(sotu_top_25, aes(x = reorder(lemmata, n), y = n)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 25 Words in SOTU Speeches",
+    x = "Words",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+
+```{r td-idf-analysis}
+# Compute tf-idf values
+sotu_tfidf <- sotu %>%
+  unnest_tokens(word, speech) %>%
+  count(president, word, sort = TRUE) %>%
+  bind_tf_idf(word, president, n)
+```
+
+```{r faceted-bar-plot, warning= FALSE}
+# Select top 10 tf-idf words per president
+top_tfidf <- sotu_tfidf %>%
+  group_by(president) %>%
+  slice_max(tf_idf, n = 10) %>%
+  ungroup()
+
+# Plot top 10 tf-idf words for each president
+ggplot(top_tfidf, aes(x = reorder_within(word, tf_idf, president), y = tf_idf, fill = president)) +
+  geom_col(show.legend = FALSE) +  
+  facet_wrap(~ president, scales = "free_y") +  
+  coord_flip() +  
+  scale_x_reordered() +  
+  scale_fill_brewer(palette = "Set3") +  
+  labs(
+    title = "Top 10 Words by TF-IDF for Each President",
+    x = "Words",
+    y = "TF-IDF"
+  )  +
+  theme(
+    strip.text = element_text(size = 8),  
+    axis.text.y = element_text(size = 6), 
+    axis.text.x = element_text(size = 6, angle = 40, hjust = 1),  
+    plot.title = element_text(size = 6, face = "bold"),  
+    plot.subtitle = element_text(size = 6)  
+  )
+```
+
+### TF-IDF Analysis of Words by President
+
+In the following figure, we show the top 10 words by TF-IDF for each president:
+
+![Top 10 TF-IDF Words by President](https://github.com/Shirisha-18/hw07/blob/aa6101256326fd3c0c8cab411411bbc19d469b90/hw07/top_tfidf_words_presidents.png)
+
+This chart highlights the most significant words in presidential speeches based on TF-IDF.
+
+## References
+
+1. https://www.storybench.org/using-french-wine-reviews-understand-tf-idf-measure-unique-word-document/
